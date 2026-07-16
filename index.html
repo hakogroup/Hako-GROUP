@@ -3417,13 +3417,13 @@
   <div class="status-dd-portal" id="status-dd-portal"></div>
   <div id="rpt-tooltip" class="rpt-tooltip"></div>
   <div id="chat-widget" style="display:none;">
-    <button type="button" id="chat-fab" aria-label="Hỏi số liệu">
+    <button type="button" id="chat-fab" aria-label="AI Agent">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
     </button>
     <div id="chat-panel">
       <div id="chat-head">
         <div>
-          <div class="ch-title">Hỏi số liệu</div>
+          <div class="ch-title">🤖 AI Agent</div>
           <div class="ch-sub" id="chat-scope-label"></div>
         </div>
         <div style="display:flex;gap:6px;">
@@ -3434,7 +3434,7 @@
       <div id="chat-msgs"></div>
       <div id="chat-chips" style="display:none;"></div>
       <div id="chat-input-row">
-        <input type="text" id="chat-input" placeholder="VD: Doanh thu tháng này của tôi?"/>
+        <input type="text" id="chat-input" placeholder="VD: Lên lịch trình tối ưu hôm nay"/>
         <button type="button" id="chat-send">Gửi</button>
       </div>
     </div>
@@ -8357,6 +8357,279 @@ Bằng việc thực hiện xác nhận điện tử bên dưới, Bên B xác n
     if(data.error) throw new Error(data.error);
     return data.reply;
   }
+  // ================== AI AGENT — công cụ + vòng lặp tự lập kế hoạch ==================
+  // Nâng cấp chat hỏi-đáp 1 lượt thành Agent nhiều bước: mô hình (Gemini qua edge function ai-chat có sẵn,
+  // KHÔNG cần deploy lại) được phép gọi các "công cụ" chạy ngay trên trình duyệt để tra dữ liệu thật,
+  // tạo/cập nhật công việc, rồi mới chốt câu trả lời. Mọi công cụ đều bó trong phạm vi quyền của người
+  // đang đăng nhập (chatAllowedEmpIds) nên nhân viên không thể nhờ Agent xem trộm dữ liệu người khác.
+  let agentHistory = []; // hội thoại trong phiên: [{role:'user'|'agent', text}]
+  const AGENT_MAX_STEPS = 5;
+  function agentTodayISO(){ return new Date().toISOString().slice(0,10); }
+  function agentDaysLeft(deadline){
+    if(!deadline) return null;
+    return Math.ceil((new Date(deadline + 'T23:59:59') - new Date()) / 86400000);
+  }
+  function agentTaskRow(t){
+    const emp = employees.find(e=>e.id===t.assigneeEmpId);
+    return {
+      id: t.id, tieu_de: t.title, nguoi_nhan: emp ? emp.name : '—',
+      han_chot: t.deadline || null, con_lai_ngay: agentDaysLeft(t.deadline),
+      trang_thai: TASK_STATUS_LABEL[t.status] || t.status,
+      mo_ta: (t.description || '').slice(0, 120)
+    };
+  }
+  function agentScopedTasks(){
+    const allowed = chatAllowedEmpIds();
+    const myId = currentUser ? currentUser.employee_id : null;
+    return tasks.filter(t => allowed.includes(t.assigneeEmpId) || (myId && t.creatorEmpId === myId));
+  }
+  const AGENT_TOOLS = {
+    // Liệt kê công việc trong phạm vi quyền — kèm số ngày còn lại để Agent tự phân loại khẩn cấp
+    xem_cong_viec(args){
+      let list = agentScopedTasks();
+      if(args && args.trang_thai){
+        const key = stripDiacritics(String(args.trang_thai)).toLowerCase();
+        list = list.filter(t => t.status === args.trang_thai || stripDiacritics(TASK_STATUS_LABEL[t.status]||'').toLowerCase().includes(key));
+      }
+      if(args && args.chua_xong) list = list.filter(t => t.status !== 'hoanthanh' && t.status !== 'huybo');
+      list = list.slice().sort((a,b)=>{
+        const da = agentDaysLeft(a.deadline), db = agentDaysLeft(b.deadline);
+        return (da===null?9999:da) - (db===null?9999:db);
+      });
+      return { so_luong: list.length, cong_viec: list.slice(0, 30).map(agentTaskRow) };
+    },
+    // Tìm kiếm khách hàng / hợp đồng / công việc / nhân sự theo từ khoá (bỏ dấu)
+    tim_kiem(args){
+      const kw = stripDiacritics(String((args && args.tu_khoa) || '')).toLowerCase().trim();
+      if(!kw) return { loi: 'Thiếu tham số tu_khoa' };
+      const allowed = chatAllowedEmpIds();
+      const hit = s => stripDiacritics(String(s || '')).toLowerCase().includes(kw);
+      const empName = id => (employees.find(e=>e.id===id) || {}).name || '';
+      return {
+        khach_hang: customerLeads.filter(l => allowed.includes(l.empId) && (hit(l.name) || hit(l.phone) || hit(l.address))).slice(0,10)
+          .map(l => ({ ten:l.name, sdt:l.phone, ngay:l.date, ket_noi:l.connectStatus||'', nhan_vien:empName(l.empId) })),
+        hop_dong: customerContracts.filter(c => allowed.includes(c.empId) && (hit(c.shop) || hit(c.phone) || hit(c.code))).slice(0,10)
+          .map(c => ({ ma:c.code, shop:c.shop, sdt:c.phone, ngay_ky:c.signDate, goi:c.package||'', nhan_vien:empName(c.empId) })),
+        cong_viec: agentScopedTasks().filter(t => hit(t.title) || hit(t.description)).slice(0,10).map(agentTaskRow),
+        nhan_su: employees.filter(e => allowed.includes(e.id) && hit(e.name)).slice(0,10)
+          .map(e => ({ ten:e.name, vi_tri:e.position }))
+      };
+    },
+    // Số liệu KPI/doanh thu của tháng (tái dùng snapshot có sẵn, đã lọc theo quyền)
+    so_lieu_thang(args){
+      const m = (args && /^\d{4}-\d{2}$/.test(args.thang || '')) ? args.thang : currentMonth();
+      return chatBuildSnapshot(m);
+    },
+    // Tổng quan hôm nay: việc quá hạn / đến hạn / sắp đến hạn + tiến độ KPI — nền cho lịch trình tối ưu
+    tong_quan_hom_nay(){
+      const list = agentScopedTasks().filter(t => t.status !== 'hoanthanh' && t.status !== 'huybo');
+      const byDays = f => list.filter(t => { const d = agentDaysLeft(t.deadline); return d !== null && f(d); });
+      const allowed = chatAllowedEmpIds();
+      const m = currentMonth();
+      return {
+        hom_nay: agentTodayISO(),
+        viec_qua_han: byDays(d => d < 0).map(agentTaskRow),
+        viec_den_han_hom_nay: byDays(d => d === 0).map(agentTaskRow),
+        viec_sap_den_han_3_ngay: byDays(d => d > 0 && d <= 3).map(agentTaskRow),
+        viec_chua_co_han: list.filter(t => !t.deadline).slice(0,10).map(agentTaskRow),
+        kpi_thang_nay: allowed.map(id => {
+          const emp = employees.find(e=>e.id===id); if(!emp) return null;
+          const r = chatEmpRevenue(emp, getComm(id, m));
+          return { ten: emp.name, doanh_thu: r.actual, chi_tieu: r.target, dat_phan_tram: r.target > 0 ? Math.round(r.actual / r.target * 100) : null };
+        }).filter(Boolean),
+        khach_moi_hom_nay: customerLeads.filter(l => allowed.includes(l.empId) && l.date === agentTodayISO()).length
+      };
+    },
+    // Tạo công việc mới (giao cho người trong phạm vi quyền; nhân viên thường chỉ tự giao cho mình)
+    async tao_cong_viec(args){
+      const title = String((args && args.tieu_de) || '').trim();
+      if(!title) return { loi: 'Thiếu tham số tieu_de' };
+      const allowed = chatAllowedEmpIds();
+      let assignee = null;
+      const nameQ = String((args && args.nguoi_nhan) || '').trim();
+      if(nameQ){
+        const found = chatFindEmployee(nameQ, allowed);
+        if(found && found.ambiguous) return { loi: 'Trùng tên nhiều người: ' + found.options.map(e=>e.name).join(', ') + '. Hãy hỏi lại người dùng chọn ai.' };
+        assignee = found;
+      }
+      if(!assignee && currentUser && currentUser.employee_id) assignee = employees.find(e => e.id === currentUser.employee_id);
+      if(!assignee) return { loi: 'Không xác định được người nhận việc trong phạm vi quyền' };
+      const deadline = (args && /^\d{4}-\d{2}-\d{2}$/.test(args.han_chot || '')) ? args.han_chot : '';
+      const newTask = {
+        id: 'tk' + Date.now() + Math.random().toString(36).slice(2,8),
+        title, description: String((args && args.mo_ta) || ''), assigneeEmpId: assignee.id,
+        creatorEmpId: currentUser ? currentUser.employee_id : null,
+        deadline, createdAt: Date.now(), updatedAt: Date.now(), status: 'chuabatdau', result: null, notes: []
+      };
+      tasks.push(newTask);
+      await patchTaskFields(newTask.id, newTask);
+      notifications.push({
+        id: 'nt' + Date.now() + Math.floor(Math.random()*1000), empId: assignee.id,
+        creatorEmpId: currentUser ? currentUser.employee_id : null, leadId: null, taskId: newTask.id,
+        title: '🤖 AI Agent giao 1 công việc mới', message: title, createdAt: Date.now(), read: false
+      });
+      await saveNotifications();
+      renderTasks(); renderNotifBadge();
+      return { thanh_cong: true, id: newTask.id, tieu_de: title, nguoi_nhan: assignee.name, han_chot: deadline || '(chưa đặt)' };
+    },
+    // Cập nhật trạng thái / hạn chót một công việc theo id
+    async cap_nhat_cong_viec(args){
+      const t = agentScopedTasks().find(x => x.id === (args && args.id));
+      if(!t) return { loi: 'Không tìm thấy công việc với id này trong phạm vi của bạn (dùng xem_cong_viec để lấy id trước)' };
+      const patch = {};
+      if(args.trang_thai){
+        const key = stripDiacritics(String(args.trang_thai)).toLowerCase();
+        const st = TASK_STATUS_LIST.find(s => s === args.trang_thai || stripDiacritics(TASK_STATUS_LABEL[s]).toLowerCase().includes(key));
+        if(st) patch.status = st;
+      }
+      if(/^\d{4}-\d{2}-\d{2}$/.test((args && args.han_chot) || '')) patch.deadline = args.han_chot;
+      if(!Object.keys(patch).length) return { loi: 'Không có gì hợp lệ để cập nhật (cần trang_thai hoặc han_chot dạng YYYY-MM-DD)' };
+      Object.assign(t, patch, { updatedAt: Date.now() });
+      await patchTaskFields(t.id, Object.assign({}, patch, { updatedAt: t.updatedAt }));
+      renderTasks();
+      return { thanh_cong: true, id: t.id, tieu_de: t.title, trang_thai: TASK_STATUS_LABEL[t.status], han_chot: t.deadline || '(chưa đặt)' };
+    }
+  };
+  function agentBuildPrompt(question, steps){
+    const hist = agentHistory.slice(-12).map(m => (m.role === 'user' ? 'Người dùng: ' : 'Agent: ') + m.text).join('\n');
+    const stepLog = steps.map((s,i) => `Bước ${i+1}: đã gọi công cụ "${s.name}" với tham số ${JSON.stringify(s.args)} → kết quả: ${JSON.stringify(s.result).slice(0, 5000)}`).join('\n');
+    return [
+      'Bạn là AI Agent của hệ thống Hako CRM, trả lời bằng tiếng Việt, giọng thân thiện gọn gàng.',
+      `Hôm nay là ${agentTodayISO()}. Người dùng có vai trò: ${currentUser ? currentUser.role : '?'} — ${chatScopeLabel()}.`,
+      'Nhiệm vụ bạn làm tốt: phân loại mức độ khẩn cấp công việc (dựa trên hạn chót: quá hạn = 🔴 khẩn cấp, hôm nay = 🟠 gấp, 1-3 ngày = 🟡 sắp tới, còn lại/không hạn = 🟢), tìm kiếm dữ liệu công ty, lên lịch trình làm việc tối ưu trong ngày, nhắc việc, tự lên kế hoạch nhiều bước (tra dữ liệu → phân tích → nếu cần thì tạo/cập nhật công việc) để đạt mục tiêu người dùng nêu.',
+      'DỮ LIỆU: khối JSON snapshot đính kèm ĐÃ CHỨA SẴN dữ liệu CRM đầy đủ trong phạm vi quyền của người dùng (nhân sự, toàn bộ công việc kèm id, khách hàng & hợp đồng gần nhất, KPI tháng này, tổng quan hôm nay) — hãy dùng trực tiếp để trả lời, KHÔNG được nói là thiếu dữ liệu. Chỉ gọi công cụ khi cần: tra tháng khác (so_lieu_thang), tìm sâu hơn phần bị cắt bớt (tim_kiem), hoặc tạo/cập nhật công việc.',
+      'CÔNG CỤ bạn được gọi (mỗi lượt chỉ 1 công cụ):',
+      '- xem_cong_viec {trang_thai?, chua_xong?:true} — liệt kê công việc kèm id, hạn chót, số ngày còn lại.',
+      '- tim_kiem {tu_khoa} — tìm khách hàng, hợp đồng, công việc, nhân sự theo từ khoá.',
+      '- so_lieu_thang {thang?:"YYYY-MM"} — doanh thu/KPI/chấm công của tháng.',
+      '- tong_quan_hom_nay {} — việc quá hạn/đến hạn/sắp đến hạn + tiến độ KPI, dùng để lên lịch trình.',
+      '- tao_cong_viec {tieu_de, nguoi_nhan?, han_chot?:"YYYY-MM-DD", mo_ta?} — tạo việc mới (chỉ tạo khi người dùng yêu cầu hoặc đồng ý rõ ràng).',
+      '- cap_nhat_cong_viec {id, trang_thai?, han_chot?:"YYYY-MM-DD"} — đổi trạng thái/hạn của việc có sẵn.',
+      'QUY TẮC TRẢ LỜI — cực kỳ quan trọng: chỉ trả về DUY NHẤT 1 object JSON, không kèm chữ nào khác, không markdown. Muốn gọi công cụ: {"cong_cu":"ten_cong_cu","tham_so":{...}}. Muốn trả lời chốt cho người dùng: {"tra_loi":"nội dung, xuống dòng bằng \\n, có thể dùng emoji"}.',
+      'Chỉ dựa vào dữ liệu công cụ trả về, tuyệt đối không bịa số liệu. Nếu chưa có dữ liệu cần thiết thì gọi công cụ trước rồi mới trả lời.',
+      hist ? ('LỊCH SỬ HỘI THOẠI:\n' + hist) : '',
+      stepLog ? ('CÁC BƯỚC ĐÃ THỰC HIỆN TRONG LƯỢT NÀY:\n' + stepLog) : '',
+      'YÊU CẦU HIỆN TẠI CỦA NGƯỜI DÙNG: ' + question,
+      steps.length >= AGENT_MAX_STEPS - 1 ? 'Bạn đã dùng gần hết số bước, hãy trả lời chốt bằng {"tra_loi":...} ngay.' : ''
+    ].filter(Boolean).join('\n\n');
+  }
+  // Gói TOÀN BỘ dữ liệu CRM (trong phạm vi quyền của người đang đăng nhập) để gửi kèm mỗi lần gọi AI —
+  // edge function ai-chat phía server dặn model "dựa vào khối JSON snapshot", nên phải đưa dữ liệu thật
+  // vào đây thì Agent mới đọc được. Có cắt bớt số dòng để không vượt giới hạn độ dài của model.
+  function agentBuildFullSnapshot(){
+    const allowed = chatAllowedEmpIds();
+    const empName = id => (employees.find(e => e.id === id) || {}).name || '—';
+    const leadsScoped = customerLeads.filter(l => allowed.includes(l.empId));
+    const contractsScoped = customerContracts.filter(c => allowed.includes(c.empId));
+    let snapshot = {
+      hom_nay: agentTodayISO(),
+      vai_tro_nguoi_dung: currentUser ? currentUser.role : '?',
+      pham_vi_duoc_xem: chatScopeLabel(),
+      nhan_su: employees.filter(e => allowed.includes(e.id)).map(e => ({ ten: e.name, vi_tri: e.position })),
+      cong_viec: agentScopedTasks().slice(0, 200).map(agentTaskRow),
+      khach_hang_gan_nhat: leadsScoped.slice().sort((a,b) => String(b.date||'').localeCompare(String(a.date||''))).slice(0, 150)
+        .map(l => ({ ten: l.name, sdt: l.phone, ngay: l.date, ket_noi: l.connectStatus||'', trang_thai_cham_soc: l.workStatus||'', nhan_vien: empName(l.empId) })),
+      tong_so_khach_hang: leadsScoped.length,
+      hop_dong_gan_nhat: contractsScoped.slice().sort((a,b) => String(b.signDate||'').localeCompare(String(a.signDate||''))).slice(0, 150)
+        .map(c => ({ ma: c.code, shop: c.shop, sdt: c.phone, ngay_ky: c.signDate, goi: c.package||'', nhan_vien: empName(c.empId) })),
+      tong_so_hop_dong: contractsScoped.length,
+      so_lieu_kpi_thang_nay: chatBuildSnapshot(currentMonth()),
+      tong_quan_cong_viec_hom_nay: AGENT_TOOLS.tong_quan_hom_nay()
+    };
+    // Nếu dữ liệu quá lớn (dễ vượt giới hạn model), giảm dần số dòng chi tiết
+    try{
+      if(JSON.stringify(snapshot).length > 220000){
+        snapshot.cong_viec = snapshot.cong_viec.slice(0, 80);
+        snapshot.khach_hang_gan_nhat = snapshot.khach_hang_gan_nhat.slice(0, 50);
+        snapshot.hop_dong_gan_nhat = snapshot.hop_dong_gan_nhat.slice(0, 50);
+        snapshot.ghi_chu_cat_bot = 'Dữ liệu chi tiết đã bị cắt bớt vì quá dài — dùng công cụ tim_kiem/xem_cong_viec để tra phần còn lại.';
+      }
+    }catch(_){ }
+    return snapshot;
+  }
+  async function agentCallLLM(prompt, snapshot){
+    // Gọi Gemini qua edge function; nếu dính lỗi hết hạn mức (429) thì đợi 4 giây tự thử lại 1 lần
+    for(let attempt = 0; attempt < 2; attempt++){
+      const res = await fetch(GEMINI_FUNCTION_URL, {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json', 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY },
+        body: JSON.stringify({ question: prompt, snapshot: snapshot || {} })
+      });
+      let bodyText = '';
+      if(!res.ok){
+        try{ bodyText = await res.text(); }catch(_){ }
+        const isQuota = res.status === 429 || /429|quota|exceeded/i.test(bodyText);
+        if(isQuota && attempt === 0){ await new Promise(r => setTimeout(r, 4000)); continue; }
+        if(isQuota) throw new Error('QUOTA');
+        throw new Error(`HTTP ${res.status}` + (bodyText ? ` — ${bodyText.slice(0,200)}` : ''));
+      }
+      const data = await res.json();
+      if(data.error){
+        if(/429|quota|exceeded/i.test(String(data.error))){
+          if(attempt === 0){ await new Promise(r => setTimeout(r, 4000)); continue; }
+          throw new Error('QUOTA');
+        }
+        throw new Error(data.error);
+      }
+      return data.reply;
+    }
+    throw new Error('QUOTA');
+  }
+  // Bóc object JSON đầu tiên trong câu trả lời (kể cả khi model lỡ bọc ```json hoặc kèm chữ thừa)
+  function agentParseJSON(text){
+    if(!text) return null;
+    const cleaned = String(text).replace(/```json|```/g, '').trim();
+    const start = cleaned.indexOf('{');
+    if(start === -1) return null;
+    for(let end = cleaned.lastIndexOf('}'); end > start; end = cleaned.lastIndexOf('}', end - 1)){
+      try{ return JSON.parse(cleaned.slice(start, end + 1)); }catch(_){ }
+    }
+    return null;
+  }
+  async function agentRun(question, statusBubble){
+    const steps = [];
+    const snapshot = agentBuildFullSnapshot();
+    for(let i = 0; i < AGENT_MAX_STEPS; i++){
+      const reply = await agentCallLLM(agentBuildPrompt(question, steps), snapshot);
+      const obj = agentParseJSON(reply);
+      // Model không theo giao thức JSON → coi toàn bộ text là câu trả lời chốt (vẫn dùng được)
+      if(!obj || (!obj.cong_cu && !obj.tra_loi)) return String(reply || '').replace(/```json|```/g, '').trim();
+      if(obj.tra_loi) return String(obj.tra_loi);
+      const tool = AGENT_TOOLS[obj.cong_cu];
+      let result;
+      if(!tool){
+        result = { loi: 'Công cụ "' + obj.cong_cu + '" không tồn tại' };
+      } else {
+        if(statusBubble) statusBubble.textContent = '🤖 Bước ' + (i+1) + ': đang dùng công cụ ' + obj.cong_cu + '…';
+        try{ result = await tool(obj.tham_so || {}); }catch(err){ result = { loi: String((err && err.message) || err) }; }
+      }
+      steps.push({ name: obj.cong_cu, args: obj.tham_so || {}, result });
+    }
+    return 'Mình đã chạy hết số bước cho phép mà chưa chốt được kết quả. Bạn thử hỏi cụ thể hơn giúp mình nhé.';
+  }
+  // Điểm tin đầu ngày: quét việc quá hạn / đến hạn (không tốn lượt gọi AI), mỗi người 1 lần/ngày
+  function agentDailyBrief(){
+    try{
+      if(!currentUser) return;
+      const key = 'hakoAgentBrief:' + (currentUser.employee_id || currentUser.username || 'x');
+      if(localStorage.getItem(key) === agentTodayISO()) return;
+      const ov = AGENT_TOOLS.tong_quan_hom_nay();
+      const n1 = ov.viec_qua_han.length, n2 = ov.viec_den_han_hom_nay.length, n3 = ov.viec_sap_den_han_3_ngay.length;
+      if(n1 + n2 + n3 === 0) return;
+      localStorage.setItem(key, agentTodayISO());
+      const parts = [];
+      if(n1) parts.push(`🔴 ${n1} việc QUÁ HẠN`);
+      if(n2) parts.push(`🟠 ${n2} việc đến hạn hôm nay`);
+      if(n3) parts.push(`🟡 ${n3} việc đến hạn trong 3 ngày tới`);
+      toast('🤖 AI Agent: ' + parts.join(' · '));
+      const lines = ['🤖 Điểm tin công việc hôm nay:'];
+      ov.viec_qua_han.slice(0,5).forEach(t => lines.push(`🔴 Quá hạn ${Math.abs(t.con_lai_ngay)} ngày — ${t.tieu_de} (${t.nguoi_nhan})`));
+      ov.viec_den_han_hom_nay.slice(0,5).forEach(t => lines.push(`🟠 Hạn hôm nay — ${t.tieu_de} (${t.nguoi_nhan})`));
+      ov.viec_sap_den_han_3_ngay.slice(0,5).forEach(t => lines.push(`🟡 Còn ${t.con_lai_ngay} ngày — ${t.tieu_de} (${t.nguoi_nhan})`));
+      lines.push('Gõ "Lên lịch trình tối ưu hôm nay" để mình sắp xếp thứ tự làm việc cho bạn nhé.');
+      chatAppendBubble(lines.join('\n'), 'bot');
+    }catch(_){ /* điểm tin lỗi thì bỏ qua, không được chặn app */ }
+  }
   function chatAppendBubble(text, who){
     const wrap = document.getElementById('chat-msgs');
     const b = document.createElement('div');
@@ -8375,12 +8648,14 @@ Bằng việc thực hiện xác nhận điện tử bên dưới, Bên B xác n
     chatAppendBubble(q, 'me');
     const input = document.getElementById('chat-input');
     if(input) input.value = '';
-    const thinkingBubble = chatAppendBubble('Đang tra cứu…', 'bot');
+    const thinkingBubble = chatAppendBubble('🤖 Đang suy nghĩ…', 'bot');
     let reply;
     try{
-      // Ưu tiên gọi Gemini (AI thật, hiểu câu hỏi tự nhiên hơn) — chỉ gửi đúng dữ liệu người này được phép xem.
-      const month = parseMonthFromText(q, currentMonth());
-      reply = await chatCallGemini(q, month);
+      // Chạy vòng lặp AI Agent: model tự gọi công cụ (tra dữ liệu, tạo/cập nhật việc) rồi mới chốt trả lời.
+      agentHistory.push({ role: 'user', text: q });
+      reply = await agentRun(q, thinkingBubble);
+      agentHistory.push({ role: 'agent', text: String(reply).slice(0, 1500) });
+      if(agentHistory.length > 24) agentHistory = agentHistory.slice(-24);
     }catch(err){
       // Gemini chưa deploy xong / lỗi mạng -> tự lùi về bộ quy tắc nội bộ để không bị đứng im, vẫn trả lời được.
       // Hiện rõ lý do lỗi ra để dễ dò (thay vì âm thầm lùi về, khiến tưởng nhầm là Gemini đã chạy).
@@ -8396,15 +8671,23 @@ Bằng việc thực hiện xác nhận điện tử bên dưới, Bên B xác n
         chatPendingQuestion = null;
         fallback = 'Xin lỗi, mình gặp lỗi khi tra dữ liệu. Bạn thử hỏi lại theo mẫu câu đơn giản hơn nhé.';
       }
-      reply = `⚠️ Chưa gọi được Gemini (lỗi: ${err && err.message ? err.message : err}) — dùng tạm bộ quy tắc có sẵn:\n\n${fallback}`;
+      const isQuota = err && err.message === 'QUOTA';
+      reply = isQuota
+        ? `⏳ AI đang hết lượt gọi miễn phí của Gemini (quota). Bạn đợi khoảng 1 phút rồi hỏi lại nhé — nếu vẫn bị, hạn mức theo NGÀY đã cạn (reset ~14h chiều giờ VN) hoặc cần nâng gói/đổi model trong Google AI Studio.\n\nTrong lúc chờ, mình trả lời tạm bằng bộ quy tắc có sẵn:\n\n${fallback}`
+        : `⚠️ Chưa gọi được Gemini (lỗi: ${err && err.message ? err.message : err}) — dùng tạm bộ quy tắc có sẵn:\n\n${fallback}`;
     }
     thinkingBubble.remove();
     chatAppendBubble(reply, 'bot');
   }
   function chatBuildChips(){
-    const chips = ['Doanh thu tháng này của tôi', 'Doanh thu và lương tháng này của tôi', 'Tiến độ KPI tháng này của tôi'];
+    const chips = [
+      'Phân loại mức độ khẩn cấp công việc của tôi',
+      'Lên lịch trình tối ưu hôm nay',
+      'Việc nào của tôi sắp trễ hạn?',
+      'Doanh thu và KPI tháng này của tôi'
+    ];
     if(currentUser && (currentUser.role === 'lead' || currentUser.role === 'giamdoc')){
-      chips.push('Tổng doanh thu team tháng này', 'Ai doanh thu cao nhất tháng này', 'Phân tích bộ phận Sales tháng này');
+      chips.push('Tổng quan công việc & KPI của team hôm nay', 'Ai doanh thu cao nhất tháng này', 'Tạo việc nhắc team họp báo cáo tuần vào thứ 6');
     }
     if(currentUser && currentUser.role === 'giamdoc'){
       chips.push('Báo cáo tổng quan công ty tháng này');
@@ -12992,6 +13275,7 @@ Bằng việc thực hiện xác nhận điện tử bên dưới, Bên B xác n
       touchSessionActivity();
       await enterApp();
       setupIdleAutoLogout();
+      agentDailyBrief();
     }catch(err){
       console.error('Login error:', err);
       errEl.textContent = 'Lỗi kết nối: ' + (err && err.message ? err.message : 'không rõ nguyên nhân');
@@ -13423,6 +13707,7 @@ Bằng việc thực hiện xác nhận điện tử bên dưới, Bên B xác n
           touchSessionActivity();
           await enterApp();
           setupIdleAutoLogout();
+          agentDailyBrief();
           return;
         }catch(_){ sessionStorage.removeItem('cc-current-user'); }
       }
