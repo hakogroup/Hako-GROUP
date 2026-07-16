@@ -1051,18 +1051,13 @@
     #app-wrap{flex-direction:column;}
     .cc-sidebar{width:82vw;max-width:280px;}
     .sidebar-foot{
-      border-top:1px solid rgba(255,255,255,.08);margin-top:6px;padding-top:6px;
+      border-top:1px solid rgba(255,255,255,.08);margin-top:12px;padding-top:12px;
       position:sticky;bottom:0;left:0;right:0;
       background:linear-gradient(175deg, var(--navy) 0%, #201E22 100%);
-      padding-bottom:calc(4px + env(safe-area-inset-bottom));
+      /* Đẩy cả cụm tài khoản + đăng xuất cao lên, tránh bị thanh điều hướng/gesture bar của điện thoại che mất */
+      padding-bottom:calc(28px + env(safe-area-inset-bottom));
       z-index:5;
     }
-    .sidebar-foot .user-chip{padding:5px 8px;gap:8px;}
-    .sidebar-foot .user-chip .avatar{width:28px;height:28px;font-size:11px;}
-    .sidebar-foot .user-chip .info .nm{font-size:12px;}
-    .sidebar-foot .user-chip .info .rl{font-size:10px;}
-    .sidebar-foot .user-menu button{padding:6px 8px;font-size:13px;}
-    .sidebar-foot .user-menu button .ico{width:22px;height:22px;}
     .user-menu{left:8px;right:8px;bottom:calc(100% + 6px);top:auto;width:auto;}
     .cc-topbar{padding:12px 16px;}
     .cc-main .wrap{padding:16px 16px 60px;}
