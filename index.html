@@ -143,6 +143,7 @@
   .pill.amber{background:var(--amber-soft);color:var(--amber);}
   .pill.red{background:var(--red-soft);color:var(--red);}
   .pill.grey{background:#EDEBE4;color:var(--ink-soft);}
+  .pill.green{background:#DFF2E7;color:#2E9A67;}
 
   .empty{text-align:center;padding:40px 20px;color:var(--ink-soft);}
   .empty .big{font-size:26px;margin-bottom:6px;}
@@ -1377,6 +1378,11 @@
 
   .rpt-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;align-items:start;}
   @media (max-width:900px){.rpt-grid-2{grid-template-columns:1fr;}}
+  /* --- Báo cáo tài chính --- */
+  .fin-legend{display:flex;gap:16px;flex-wrap:wrap;margin:2px 0 8px;}
+  .fin-legend-item{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--ink-soft);}
+  .fin-legend-item .dot{width:10px;height:10px;border-radius:3px;display:inline-block;}
+  .fin-legend-item .line{width:16px;height:3px;border-radius:2px;display:inline-block;}
   .rpt-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px;align-items:start;}
   @media (max-width:960px){.rpt-grid-3{grid-template-columns:1fr 1fr;}}
   @media (max-width:640px){.rpt-grid-3{grid-template-columns:1fr;}}
@@ -1776,6 +1782,7 @@
       <nav class="cc-nav">
         <div class="cc-nav-label">Menu</div>
         <div class="cc-tab cc-tab-primary active" data-tab="report"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.2 14.2a7.8 7.8 0 0 1 15.6 0"/><path d="M12 14.2l3.6-4.4"/><circle cx="12" cy="14.2" r="1.4" fill="currentColor" stroke="none"/><path d="M4.2 14.2h1.6M18.2 14.2h1.6M6.6 8.3l1.1 1.1M17.4 8.3l-1.1 1.1"/></svg></span>Dashboard</div>
+        <div class="cc-tab" data-tab="fin"><span class="ico ico-gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M9.5 20V4M15 20v-7M20 20V8"/><path d="M3 20h18"/><circle cx="9.5" cy="4" r="0" fill="currentColor" stroke="none"/></svg></span>Báo cáo tài chính</div>
         <div class="cc-tab" data-tab="plan"><span class="ico ico-amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/></svg></span>Mục Tiêu &amp; Doanh Thu</div>
 
         <div class="cc-nav-group" data-group="contracts-customers">
@@ -1800,7 +1807,6 @@
         </div>
 
         <div class="cc-tab" data-tab="com"><span class="ico ico-fuchsia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r=".6" fill="currentColor" stroke="none"/></svg></span>Hoa hồng / KPI</div>
-        <div class="cc-tab" data-tab="fin"><span class="ico ico-gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M9.5 20V4M15 20v-7M20 20V8"/><path d="M3 20h18"/><circle cx="9.5" cy="4" r="0" fill="currentColor" stroke="none"/></svg></span>Báo cáo tài chính</div>
         <div class="cc-tab" data-tab="set"><span class="ico ico-gray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/></svg></span>Cài đặt chung</div>
       </nav>
       <div class="sidebar-foot">
@@ -2495,18 +2501,6 @@
 
       <div class="rpt-kpi-strip" id="report-summary"></div>
 
-      <!-- Báo cáo tài chính (Thu - Chi) — chỉ hiện với tài khoản Giám đốc -->
-      <div class="rpt-card report-card" id="report-finance-card" style="margin-bottom:14px;display:none;">
-        <h3><span class="rpt-h3-ico teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 9.5v0M18 14.5v0"/></svg></span>Báo cáo tài chính (Thu – Chi) <span class="rpt-dept-badge sales">Tài chính</span></h3>
-        <div class="tbl-scroll">
-          <table class="funnel-stage-table">
-            <thead><tr><th>Khoản mục</th><th class="num">Số tiền (đ)</th><th class="num">Tỉ trọng</th></tr></thead>
-            <tbody id="report-finance-tbody"></tbody>
-          </table>
-        </div>
-        <p class="sub" id="report-finance-note" style="margin:8px 0 0;"></p>
-      </div>
-
       <!-- Hàng A: Doanh thu công ty | Xếp hạng doanh số / Hợp đồng — song song 1x1 -->
       <div class="rpt-grid-2">
         <div class="rpt-card report-card">
@@ -3089,57 +3083,138 @@
         <div class="ph-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M9.5 20V4M15 20v-7M20 20V8"/><path d="M3 20h18"/></svg></div>
         <div class="ph-text"><h1>Báo cáo tài chính</h1></div>
       </div>
-      <p class="sub" style="margin:-6px 0 12px;">Khoản thu lấy tự động từ <strong>doanh thu hợp đồng</strong> (theo ngày ký). Khoản chi gồm <strong>lương</strong>, <strong>thưởng &amp; hoa hồng</strong> (từ bảng lương) và <strong>chi phí marketing</strong> (nhập ở tab Hoa hồng / KPI của bộ phận Marketing). Các khoản nhỏ lẻ ngoài CRM nhập thêm ở mục cuối trang. Dữ liệu tính theo tháng đang chọn ở góc trên.</p>
 
-      <div class="cc-summary" id="fin-summary"></div>
+      <div class="rpt-intro">
+        <div>
+          <h2 style="margin:0;">Tổng Quan Tài Chính — <span class="fin-period-label"></span></h2>
+        </div>
+      </div>
 
+      <div class="rpt-kpi-strip" id="fin-summary"></div>
+
+      <!-- Xu hướng Thu - Chi - Lợi nhuận theo tháng -->
+      <div class="rpt-card report-card" style="margin-bottom:14px;">
+        <h3><span class="rpt-h3-ico teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 7-8"/><path d="M14 7h6v6"/></svg></span>Xu hướng Thu – Chi – Lợi nhuận <span class="rpt-dept-badge sales" id="fin-trend-badge">12 tháng gần nhất</span></h3>
+        <div class="fin-legend">
+          <span class="fin-legend-item"><span class="dot" style="background:#2E9A67;"></span>Thu</span>
+          <span class="fin-legend-item"><span class="dot" style="background:var(--red);"></span>Chi</span>
+          <span class="fin-legend-item"><span class="line" style="background:#3E5FA0;"></span>Lợi nhuận</span>
+        </div>
+        <div id="fin-trend-chart"></div>
+      </div>
+
+      <!-- Cơ cấu khoản chi | Cơ cấu nguồn thu -->
+      <div class="rpt-grid-2">
+        <div class="rpt-card report-card">
+          <h3><span class="rpt-h3-ico cskh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 9 9h-9z"/><path d="M12 3v9h9"/></svg></span>Cơ cấu khoản chi <span class="rpt-dept-badge cskh fin-period-badge"></span></h3>
+          <div id="fin-expense-donut"></div>
+        </div>
+        <div class="rpt-card report-card">
+          <h3><span class="rpt-h3-ico sales"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V13M10 20V6M16 20v-9"/><path d="M3 20h18"/></svg></span>Cơ cấu nguồn thu <span class="rpt-dept-badge sales fin-period-badge"></span></h3>
+          <div id="fin-income-bar"></div>
+        </div>
+      </div>
+
+      <!-- Bảng thu | Bảng chi -->
       <div class="rpt-grid-2">
         <div class="cc-card" style="padding:0;overflow:hidden;">
-          <div style="padding:16px 18px 4px;"><h2>Khoản thu — tháng <span class="month-label"></span></h2></div>
+          <div style="padding:16px 18px 4px;"><h2>Khoản thu — <span class="fin-period-label"></span></h2></div>
           <div class="tbl-scroll">
             <table>
-              <thead><tr><th>Khoản mục</th><th class="num">Số tiền (đ)</th></tr></thead>
+              <thead><tr><th>Khoản mục</th><th class="num">Số tiền (đ)</th><th class="num">Tỉ trọng</th></tr></thead>
               <tbody id="fin-income-tbody"></tbody>
             </table>
           </div>
         </div>
         <div class="cc-card" style="padding:0;overflow:hidden;">
-          <div style="padding:16px 18px 4px;"><h2>Khoản chi — tháng <span class="month-label"></span></h2></div>
+          <div style="padding:16px 18px 4px;"><h2>Khoản chi — <span class="fin-period-label"></span></h2></div>
           <div class="tbl-scroll">
             <table>
-              <thead><tr><th>Khoản mục</th><th class="num">Số tiền (đ)</th></tr></thead>
+              <thead><tr><th>Khoản mục</th><th class="num">Số tiền (đ)</th><th class="num">Tỉ trọng</th></tr></thead>
               <tbody id="fin-expense-tbody"></tbody>
             </table>
           </div>
         </div>
       </div>
 
-      <div class="cc-card">
-        <h2>Khoản thu / chi nhỏ lẻ ngoài CRM — tháng <span class="month-label"></span></h2>
-        <p class="sub">Dùng cho các khoản không có sẵn trong hệ thống (VD: tiền điện nước, văn phòng phẩm, thu thanh lý...). Các khoản này sẽ tự cộng vào bảng thu/chi ở trên.</p>
-        <div class="cc-row" style="align-items:flex-end;">
-          <div class="cc-field"><label>Loại</label>
-            <select id="fe-type" style="min-width:110px;">
-              <option value="chi">Khoản chi</option>
-              <option value="thu">Khoản thu</option>
-            </select>
+      <!-- Top khoản chi lớn nhất | Pivot Thu - Chi - LN theo tháng -->
+      <div class="rpt-grid-2">
+        <div class="cc-card" style="padding:0;overflow:hidden;">
+          <div style="padding:16px 18px 4px;"><h2>Top khoản chi lớn nhất — <span class="fin-period-label"></span></h2></div>
+          <div class="tbl-scroll" style="max-height:340px;">
+            <table>
+              <thead><tr><th style="width:40px;">Hạng</th><th>Khoản chi</th><th>Nhóm</th><th class="num">Số tiền (đ)</th><th class="num">% tổng chi</th></tr></thead>
+              <tbody id="fin-top-expense-tbody"></tbody>
+            </table>
           </div>
-          <div class="cc-field"><label>Tên khoản</label><input id="fe-name" placeholder="VD: Tiền điện tháng này" style="min-width:200px;"/></div>
-          <div class="cc-field"><label>Số tiền (đ)</label><input id="fe-amount" type="text" inputmode="numeric" data-money placeholder="0" style="min-width:130px;"/></div>
-          <div class="cc-field"><label>Ngày</label><input id="fe-date" type="date" style="min-width:140px;"/></div>
-          <div class="cc-field"><label>Ghi chú</label><input id="fe-note" placeholder="(không bắt buộc)" style="min-width:180px;"/></div>
-          <button class="btn" id="btn-add-fin-entry" type="button">+ Thêm khoản</button>
         </div>
-        <div class="tbl-scroll" style="margin-top:12px;">
+        <div class="cc-card" style="padding:0;overflow:hidden;">
+          <div style="padding:16px 18px 4px;"><h2>Tổng hợp Thu – Chi – Lợi nhuận theo tháng</h2></div>
+          <div class="tbl-scroll" style="max-height:340px;">
+            <table>
+              <thead><tr><th>Tháng</th><th class="num">Thu (đ)</th><th class="num">Chi (đ)</th><th class="num">Lợi nhuận (đ)</th><th class="num">Tỉ suất</th></tr></thead>
+              <tbody id="fin-pivot-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Khoản thu / chi khác (nhập tay) — form dạng hộp thoại + bảng có tìm kiếm, lọc, phân trang
+           (thao tác giống tab Khách hàng) -->
+      <div class="modal-overlay" id="fin-entry-modal-overlay" style="display:none;">
+        <div class="modal-box" style="max-width:560px;">
+          <div class="modal-box-head">
+            <h2 id="fin-entry-form-title" style="margin:0;">Thêm khoản thu / chi</h2>
+            <button type="button" class="modal-close-btn" id="fin-entry-modal-close">✕</button>
+          </div>
+          <div class="cc-row">
+            <div class="cc-field"><label>Loại</label>
+              <select id="fe-type" style="min-width:120px;">
+                <option value="chi">Khoản chi</option>
+                <option value="thu">Khoản thu</option>
+              </select>
+            </div>
+            <div class="cc-field"><label>Ngày</label><input id="fe-date" type="date" style="min-width:140px;"/></div>
+            <div class="cc-field"><label>Tên khoản</label><input id="fe-name" placeholder="VD: Tiền điện, thuê mặt bằng..." style="min-width:220px;"/></div>
+            <div class="cc-field"><label>Số tiền (đ)</label><input id="fe-amount" type="text" inputmode="numeric" data-money placeholder="0" style="min-width:140px;"/></div>
+            <div class="cc-field" style="flex:1;min-width:220px;"><label>Ghi chú</label><input id="fe-note" placeholder="(không bắt buộc)"/></div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:14px;">
+            <button class="btn teal" id="btn-add-fin-entry" type="button">+ Lưu khoản</button>
+            <button class="btn ghost" id="btn-cancel-fin-edit" type="button">Huỷ</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="cc-card" style="padding:0;overflow:hidden;">
+        <div style="padding:16px 18px 4px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+          <h2 style="margin:0;">Khoản thu / chi khác — <span class="fin-period-label"></span> (<span id="fin-manual-count">0</span>)</h2>
+          <div class="quick-filter-row">
+            <input id="fin-manual-search" type="text" placeholder="🔎 Tìm tên khoản, ghi chú, người tạo..." style="border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px;min-width:230px;"/>
+            <select id="fin-manual-type-filter">
+              <option value="">💱 Tất cả loại</option>
+              <option value="thu">Khoản thu</option>
+              <option value="chi">Khoản chi</option>
+            </select>
+            <button class="btn teal" id="btn-open-fin-entry-modal" type="button">+ Thêm khoản</button>
+          </div>
+        </div>
+        <div style="padding:0 18px 14px;display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;">
+          <div class="cc-field"><label>Từ ngày</label><input id="fin-manual-from" type="date"/></div>
+          <div class="cc-field"><label>Đến ngày</label><input id="fin-manual-to" type="date"/></div>
+          <button class="btn ghost sm" id="fin-manual-filter-clear" type="button">Xoá lọc</button>
+        </div>
+        <div class="tbl-scroll">
           <table>
-            <thead><tr><th>Ngày</th><th>Loại</th><th>Tên khoản</th><th class="num">Số tiền (đ)</th><th>Ghi chú</th><th></th></tr></thead>
+            <thead><tr><th>Ngày</th><th>Loại</th><th>Tên khoản</th><th class="num">Số tiền (đ)</th><th>Người tạo</th><th>Ghi chú</th><th></th></tr></thead>
             <tbody id="fin-manual-tbody"></tbody>
           </table>
         </div>
         <div class="empty" id="fin-manual-empty" style="display:none;">
           <div class="big">🧾</div>
-          Chưa có khoản thu/chi lẻ nào trong tháng này.
+          Chưa có khoản thu/chi nào trong kỳ này.
         </div>
+        <div class="cc-pagination" id="fin-manual-pagination"></div>
       </div>
     </div>
 
@@ -5930,7 +6005,7 @@
             <div><span class="lbl">Phụ cấp cố định</span><span class="val mono-cell">${fmt(emp.allowance)}đ</span></div>
             <div><span class="lbl">Ngày công chuẩn</span><span class="val mono-cell">${emp.standardDays}</span></div>
             <div><span class="lbl">Người phụ thuộc</span><span class="val mono-cell">${emp.dependents}</span></div>
-            ${emp.position==='sales' ? `<div><span class="lbl">Cách tính lương</span><span class="val">${(emp.salaryMode||'kpi')==='fixed' ? '🔒 Lương cứng (không áp KPI)' : '📊 Theo KPI doanh thu'}</span></div>` : ''}
+            ${emp.position==='sales' ? `<div><span class="lbl">Cách tính lương</span><span class="val">${(emp.salaryMode||'kpi')==='fixed' ? 'Lương cứng (không áp KPI)' : 'Theo KPI doanh thu'}</span></div>` : ''}
             <div><span class="lbl">Ngân hàng</span><span class="val">${escapeHtml(emp.bankName||'—')}</span></div>
             <div><span class="lbl">Số tài khoản</span><span class="val mono-cell">${escapeHtml(emp.bankAccount||'—')}</span></div>
             <div><span class="lbl">Tên chủ tài khoản</span><span class="val">${escapeHtml(emp.bankHolder||'—')}</span></div>
@@ -9787,7 +9862,6 @@ Bằng việc thực hiện xác nhận điện tử bên dưới, Bên B xác n
     const rptTitleEl = document.getElementById('rpt-period-title');
     if(rptTitleEl) rptTitleEl.textContent = rptPeriodLabel();
     renderSalesHero();
-    renderFinanceDashboard();
     renderMarketingKpi();
     renderBestSales();
     renderFirstDealTime();
@@ -11642,6 +11716,42 @@ Bằng việc thực hiện xác nhận điện tử bên dưới, Bên B xác n
   }
 
   // ---------- Báo cáo tài chính (Thu - Chi) ----------
+  // Tab Tài chính dùng CHUNG bộ chọn kỳ (Tháng/Quý/Năm) ở lịch trên header với Dashboard (rptViewMode)
+  function finPeriodMonths(){ return rptPeriodMonths(); }
+  function finPeriodLabel(){ return rptPeriodLabel(); }
+  function finPrevPeriodMonths(){ return rptPrevPeriodMonths(); }
+  function finPrevPeriodName(){ return rptPrevPeriodName(); }
+  // Các tháng hiển thị trên biểu đồ xu hướng & bảng tổng hợp — bám đúng kỳ đang chọn:
+  // Tháng -> 12 tháng gần nhất (để thấy xu hướng), Quý -> 3 tháng của quý đó, Năm -> 12 tháng của năm đó
+  function finChartMonths(){
+    if(rptViewMode === 'quarter' || rptViewMode === 'year') return rptPeriodMonths();
+    return finLast12Months();
+  }
+  function finChartLabel(){
+    if(rptViewMode === 'quarter' || rptViewMode === 'year') return rptPeriodLabel();
+    return '12 tháng gần nhất';
+  }
+  // Màu quy ước xuyên suốt tab Tài chính: xanh lá = Thu, đỏ = Chi, xanh dương = Lợi nhuận
+  const FIN_GREEN = '#2E9A67';
+  const FIN_BLUE = '#3E5FA0';
+  function finLast12Months(){
+    const [y, mo] = currentMonth().split('-').map(Number);
+    const arr = [];
+    for(let i=11;i>=0;i--){
+      const d = new Date(y, mo-1-i, 1);
+      arr.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`);
+    }
+    return arr;
+  }
+  // Rút gọn số tiền cho biểu đồ: 1.250.000.000 -> "1,25 tỷ"; 25.500.000 -> "25,5tr"; 500.000 -> "500k"
+  function fmtMoneyShort(v){
+    const sign = (v||0) < 0 ? '-' : '';
+    const a = Math.abs(v || 0);
+    if(a >= 1e9) return sign + String((a/1e9).toFixed(2)).replace(/\.?0+$/,'').replace('.', ',') + ' tỷ';
+    if(a >= 1e6) return sign + String(a/1e6 >= 100 ? Math.round(a/1e6) : +(a/1e6).toFixed(1)).replace('.', ',') + 'tr';
+    if(a >= 1e3) return sign + Math.round(a/1e3) + 'k';
+    return sign + fmt(a);
+  }
   // Nhân viên có làm việc trong tháng m không (tránh cộng chi phí lương của người đã nghỉ từ trước
   // hoặc chưa nhận việc vào báo cáo tài chính của tháng đó).
   function finEmpActiveInMonth(emp, m){
@@ -11649,6 +11759,7 @@ Bằng việc thực hiện xác nhận điện tử bên dưới, Bên B xác n
     if(emp.startDate && emp.startDate.slice(0,7) > m) return false;
     return true;
   }
+  const FIN_ATT_EMPTY = {actualDays:0, leavePaid:0, leaveUnpaid:0, lateT1:0, lateT2:0, lateT3:0, earlyT1:0, earlyT2:0, earlyT3:0, otWeekday:0, otWeekend:0, otHoliday:0, bonus:0, otherDeduction:0};
   // Tính toàn bộ số liệu thu/chi của 1 tháng. Đọc dữ liệu KHÔNG tạo node mới (khác getAtt/getComm)
   // để xem báo cáo quý/năm không sinh rác dữ liệu rỗng cho các tháng chưa có chấm công.
   function computeFinanceMonth(m){
@@ -11656,10 +11767,9 @@ Bằng việc thực hiện xác nhận điện tử bên dưới, Bên B xác n
     const contractRevenue = monthContracts.reduce((s,c)=> s + (c.revenue||0), 0);
 
     let salaryCost = 0, bonusCost = 0, marketingCost = 0;
-    const ATT_EMPTY = {actualDays:0, leavePaid:0, leaveUnpaid:0, lateT1:0, lateT2:0, lateT3:0, earlyT1:0, earlyT2:0, earlyT3:0, otWeekday:0, otWeekend:0, otHoliday:0, bonus:0, otherDeduction:0};
     employees.forEach(emp=>{
       if(!finEmpActiveInMonth(emp, m)) return;
-      const att = (attendanceByMonth[m] && attendanceByMonth[m][emp.id]) || ATT_EMPTY;
+      const att = (attendanceByMonth[m] && attendanceByMonth[m][emp.id]) || FIN_ATT_EMPTY;
       const comm = (commissionByMonth[m] && commissionByMonth[m][emp.id]) || {revenue:0, marketingCost:0};
       const p = computePayroll(emp, att, comm);
       // Chi lương = tổng chi phí công ty (gross + BHXH DN đóng) TRỪ phần thưởng & hoa hồng (tách riêng dòng dưới)
@@ -11681,7 +11791,7 @@ Bằng việc thực hiện xác nhận điện tử bên dưới, Bên B xác n
       totalIncome, totalExpense, profit: totalIncome - totalExpense, entries
     };
   }
-  // Cộng dồn số liệu tài chính của nhiều tháng (dùng cho Dashboard xem theo quý/năm).
+  // Cộng dồn số liệu tài chính của nhiều tháng (Dashboard xem theo quý/năm & bộ lọc kỳ của tab Tài chính).
   function computeFinanceForMonths(months){
     const sum = {contractCount:0, contractRevenue:0, otherIncome:0, salaryCost:0, bonusCost:0, marketingCost:0, otherExpense:0, totalIncome:0, totalExpense:0, profit:0};
     (months||[]).forEach(m=>{
@@ -11690,114 +11800,399 @@ Bằng việc thực hiện xác nhận điện tử bên dưới, Bên B xác n
     });
     return sum;
   }
+  // Số liệu chi tiết phục vụ biểu đồ cơ cấu & bảng top khoản chi: chi phí theo TỪNG nhân viên,
+  // chi marketing theo từng NV Marketing, doanh thu theo từng gói đăng ký, danh sách khoản lẻ trong kỳ.
+  function computeFinanceDetail(months){
+    const sum = computeFinanceForMonths(months);
+    const empCost = {}, mktByEmp = {};
+    months.forEach(m=>{
+      employees.forEach(emp=>{
+        if(!finEmpActiveInMonth(emp, m)) return;
+        const att = (attendanceByMonth[m] && attendanceByMonth[m][emp.id]) || FIN_ATT_EMPTY;
+        const comm = (commissionByMonth[m] && commissionByMonth[m][emp.id]) || {revenue:0, marketingCost:0};
+        const p = computePayroll(emp, att, comm);
+        if(p.totalCompanyCost > 0){
+          empCost[emp.id] = empCost[emp.id] || {name: emp.name, amount: 0};
+          empCost[emp.id].amount += p.totalCompanyCost;
+        }
+        if(emp.position === 'marketing' || (emp.position === 'lead' && (emp.leadDept||'sales') === 'marketing')){
+          const mc = comm.marketingCost || 0;
+          if(mc > 0){
+            mktByEmp[emp.id] = mktByEmp[emp.id] || {name: emp.name, amount: 0};
+            mktByEmp[emp.id].amount += mc;
+          }
+        }
+      });
+    });
+    const monthSet = new Set(months);
+    const pkgMap = {};
+    customerContracts.forEach(c=>{
+      if(!monthSet.has((c.signDate||'').slice(0,7))) return;
+      const key = String(c.package||'').trim() || 'Chưa ghi gói';
+      pkgMap[key] = (pkgMap[key]||0) + (c.revenue||0);
+    });
+    const entries = [];
+    months.forEach(m=> finEntriesOfMonth(m).forEach(e=> entries.push({...e, month: m})));
+    entries.sort((a,b)=> String(b.date||'').localeCompare(String(a.date||'')) || (b.time||0)-(a.time||0));
+    return {...sum, empCost: Object.values(empCost), mktByEmp: Object.values(mktByEmp), pkgMap, entries};
+  }
+  // Gom các mục nhỏ vào "Khác" để biểu đồ cơ cấu gọn gàng (giữ tối đa 5 mục lớn nhất + "Khác")
+  function finTopWithOther(items, topN){
+    items = items.filter(it => (it.value||0) > 0).sort((a,b)=> (b.value||0)-(a.value||0));
+    if(items.length <= topN + 1) return items;
+    const top = items.slice(0, topN);
+    const other = items.slice(topN).reduce((s,it)=> s + (it.value||0), 0);
+    return [...top, {label:'Khác', value: other}];
+  }
+  // Biểu đồ cột ghép (Thu xanh / Chi đỏ, cùng 1 trục tiền) + đường Lợi nhuận (có thể âm) — dùng chung 1 thang đo.
+  function svgFinanceTrendChart(items){
+    if(!items.length || !items.some(it => (it.thu||0) > 0 || (it.chi||0) > 0)){
+      return '<p class="report-empty-note">Chưa có dữ liệu thu/chi trong 12 tháng gần nhất.</p>';
+    }
+    const n = items.length;
+    const colW = 66, padL = 58, padR = 16, padT = 24, padB = 34, chartH = 210;
+    const chartW = n*colW, fullW = padL + chartW + padR, fullH = padT + chartH + padB;
+    const maxV = Math.max(1, ...items.map(it => Math.max(it.thu||0, it.chi||0, it.profit||0)));
+    const minV = Math.min(0, ...items.map(it => it.profit||0));
+    const span = (maxV - minV) || 1;
+    const y = v => padT + (maxV - v)/span*chartH;
+    const zeroY = y(0);
+    let svg = '';
+    for(let g=0; g<=4; g++){
+      const gv = minV + span*g/4;
+      const gy = y(gv);
+      svg += `<line x1="${padL}" y1="${gy.toFixed(1)}" x2="${padL+chartW}" y2="${gy.toFixed(1)}" stroke="var(--line)" stroke-width="1" stroke-dasharray="3,3"></line>`;
+      svg += `<text x="${padL-8}" y="${(gy+3).toFixed(1)}" text-anchor="end" font-size="9.5" fill="var(--ink-soft)" font-family="var(--mono)">${fmtMoneyShort(gv)}</text>`;
+    }
+    svg += `<line x1="${padL}" y1="${zeroY.toFixed(1)}" x2="${padL+chartW}" y2="${zeroY.toFixed(1)}" stroke="var(--ink-soft)" stroke-width="1" opacity="0.6"></line>`;
+    const barW = 16, gap = 4;
+    items.forEach((it,i)=>{
+      const cx = padL + i*colW + colW/2;
+      const thuY = y(it.thu||0), chiY = y(it.chi||0);
+      svg += `<rect x="${(cx-barW-gap/2).toFixed(1)}" y="${thuY.toFixed(1)}" width="${barW}" height="${Math.max(1.5, zeroY-thuY).toFixed(1)}" rx="4" fill="#2E9A67" data-tip="${escapeHtml(it.label)} — Thu: ${fmt(it.thu||0)}đ"></rect>`;
+      svg += `<rect x="${(cx+gap/2).toFixed(1)}" y="${chiY.toFixed(1)}" width="${barW}" height="${Math.max(1.5, zeroY-chiY).toFixed(1)}" rx="4" fill="var(--red)" data-tip="${escapeHtml(it.label)} — Chi: ${fmt(it.chi||0)}đ"></rect>`;
+      svg += `<text x="${cx.toFixed(1)}" y="${(padT+chartH+17).toFixed(1)}" text-anchor="middle" font-size="10" fill="var(--ink)"${it.bold ? ' font-weight="800"' : ''}>${escapeHtml(it.label)}</text>`;
+    });
+    const pts = items.map((it,i)=> `${(padL+i*colW+colW/2).toFixed(1)},${y(it.profit||0).toFixed(1)}`);
+    svg += `<polyline points="${pts.join(' ')}" fill="none" stroke="#3E5FA0" stroke-width="2.5"></polyline>`;
+    items.forEach((it,i)=>{
+      const cx = padL + i*colW + colW/2, cy = y(it.profit||0);
+      svg += `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="4" fill="#3E5FA0" stroke="#fff" stroke-width="1.5" data-tip="${escapeHtml(it.label)} — Lợi nhuận: ${fmt(it.profit||0)}đ"></circle>`;
+      svg += `<text x="${cx.toFixed(1)}" y="${(cy-8).toFixed(1)}" text-anchor="middle" font-size="9" font-weight="700" font-family="var(--mono)" fill="#3E5FA0">${fmtMoneyShort(it.profit||0)}</text>`;
+    });
+    return `<div class="chart-scroll"><svg viewBox="0 0 ${fullW} ${fullH}" width="${fullW}" height="${fullH}" style="max-width:100%;">${svg}</svg></div>`;
+  }
+  // Tooltip cho biểu đồ trong tab Tài chính (dùng chung phần tử #rpt-tooltip của Dashboard)
+  let finTooltipInited = false;
+  function initFinTooltip(){
+    if(finTooltipInited) return;
+    const tip = document.getElementById('rpt-tooltip');
+    const panel = document.getElementById('panel-fin');
+    if(!tip || !panel) return;
+    finTooltipInited = true;
+    function place(x, y){
+      const vw = window.innerWidth, vh = window.innerHeight;
+      const tw = tip.offsetWidth||120, th = tip.offsetHeight||30;
+      let left = x+14, top = y+14;
+      if(left+tw > vw-8) left = x-tw-14;
+      if(top+th > vh-8) top = y-th-14;
+      tip.style.left = left+'px'; tip.style.top = top+'px';
+    }
+    panel.addEventListener('mousemove', e=>{
+      const t = e.target.closest('[data-tip]');
+      if(t){ tip.textContent = t.getAttribute('data-tip'); place(e.clientX, e.clientY); tip.classList.add('show'); }
+      else tip.classList.remove('show');
+    });
+    panel.addEventListener('mouseleave', ()=> tip.classList.remove('show'));
+    panel.addEventListener('touchstart', e=>{
+      const t = e.target.closest('[data-tip]');
+      if(t && e.touches[0]){ tip.textContent = t.getAttribute('data-tip'); place(e.touches[0].clientX, e.touches[0].clientY); tip.classList.add('show'); }
+      else tip.classList.remove('show');
+    }, {passive:true});
+  }
 
   function renderFinance(){
     const sumEl = document.getElementById('fin-summary');
     if(!sumEl) return;
-    updateMonthLabels();
-    const m = currentMonth();
-    const f = computeFinanceMonth(m);
+    initFinTooltip();
+    const months = finPeriodMonths();
+    const f = computeFinanceDetail(months);
+    const fPrev = computeFinanceForMonths(finPrevPeriodMonths());
+    const label = finPeriodLabel();
+    $$('.fin-period-label').forEach(el=> el.textContent = label);
+    $$('.fin-period-badge').forEach(el=> el.textContent = label);
 
-    const profitColor = f.profit >= 0 ? 'var(--teal)' : 'var(--red)';
+    const profitColor = f.profit >= 0 ? FIN_GREEN : 'var(--red)';
     const marginPct = f.totalIncome > 0 ? (f.profit / f.totalIncome * 100) : 0;
+    const prevMarginPct = fPrev.totalIncome > 0 ? (fPrev.profit / fPrev.totalIncome * 100) : 0;
+    const pctOf = (v, total)=> total > 0 ? (v/total*100).toFixed(1)+'%' : '—';
+
+    // Chip tăng trưởng so với kỳ liền trước (giống Dashboard). invert=true cho khoản CHI:
+    // chi TĂNG là tín hiệu xấu (đỏ), chi GIẢM là tốt (xanh).
+    function finTrendChip(curr, prev, invert){
+      if(!prev){
+        if(!curr) return '<span class="rpt-trend flat">0%</span>';
+        return `<span class="rpt-trend ${invert ? 'down' : 'up'}">▲ mới</span>`;
+      }
+      const g = (curr - prev) / Math.abs(prev) * 100;
+      if(Math.abs(g) < 0.5) return '<span class="rpt-trend flat">0%</span>';
+      const rising = g >= 0;
+      const cls = rising ? (invert ? 'down' : 'up') : (invert ? 'up' : 'down');
+      return `<span class="rpt-trend ${cls}">${rising ? '▲' : '▼'} ${Math.abs(g).toFixed(0)}%</span>`;
+    }
+    const prevName = finPrevPeriodName();
+    const ICO_FIN_IN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 7-8"/><path d="M14 7h6v6"/></svg>';
+    const ICO_FIN_OUT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/></svg>';
+    const ICO_FIN_PROFIT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V13M10 20V6M16 20v-9"/><path d="M3 20h18"/></svg>';
+    const ICO_FIN_MARGIN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 5L5 19"/><circle cx="7" cy="7" r="2.5"/><circle cx="17" cy="17" r="2.5"/></svg>';
     sumEl.innerHTML = `
-      <div class="sum-card"><div class="lbl">Tổng thu</div><div class="val">${fmt(f.totalIncome)}đ</div></div>
-      <div class="sum-card"><div class="lbl">Tổng chi</div><div class="val">${fmt(f.totalExpense)}đ</div></div>
-      <div class="sum-card"><div class="lbl">${f.profit >= 0 ? 'Lợi nhuận' : 'Lỗ'}</div><div class="val" style="color:${profitColor};">${fmt(f.profit)}đ</div></div>
-      <div class="sum-card"><div class="lbl">Tỉ suất lợi nhuận / thu</div><div class="val" style="color:${profitColor};">${f.totalIncome>0 ? marginPct.toFixed(1)+'%' : '—'}</div></div>
+      <div class="rpt-kpi-card hero">
+        <div class="rpt-kpi-top"><div class="rpt-kpi-icon">${ICO_FIN_IN}</div>${finTrendChip(f.totalIncome, fPrev.totalIncome)}</div>
+        <div class="rpt-kpi-lbl">Tổng thu</div>
+        <div class="rpt-kpi-val">${fmt(f.totalIncome)}đ</div>
+        <div class="rpt-kpi-sub">Cùng kỳ ${prevName}: ${fmt(fPrev.totalIncome)}đ</div>
+      </div>
+      <div class="rpt-kpi-card tone-b">
+        <div class="rpt-kpi-top"><div class="rpt-kpi-icon">${ICO_FIN_OUT}</div>${finTrendChip(f.totalExpense, fPrev.totalExpense, true)}</div>
+        <div class="rpt-kpi-lbl">Tổng chi</div>
+        <div class="rpt-kpi-val">${fmt(f.totalExpense)}đ</div>
+        <div class="rpt-kpi-sub">Cùng kỳ ${prevName}: ${fmt(fPrev.totalExpense)}đ</div>
+      </div>
+      <div class="rpt-kpi-card tone-c">
+        <div class="rpt-kpi-top"><div class="rpt-kpi-icon">${ICO_FIN_PROFIT}</div>${finTrendChip(f.profit, fPrev.profit)}</div>
+        <div class="rpt-kpi-lbl">${f.profit >= 0 ? 'Lợi nhuận' : 'Lỗ'}</div>
+        <div class="rpt-kpi-val" style="color:${profitColor};">${fmt(f.profit)}đ</div>
+        <div class="rpt-kpi-sub">Cùng kỳ ${prevName}: ${fmt(fPrev.profit)}đ</div>
+      </div>
+      <div class="rpt-kpi-card tone-a">
+        <div class="rpt-kpi-top"><div class="rpt-kpi-icon">${ICO_FIN_MARGIN}</div>${finTrendChip(marginPct, prevMarginPct)}</div>
+        <div class="rpt-kpi-lbl">Tỉ suất lợi nhuận</div>
+        <div class="rpt-kpi-val">${f.totalIncome > 0 ? marginPct.toFixed(1)+'%' : '—'}</div>
+        <div class="rpt-kpi-sub">Cùng kỳ ${prevName}: ${fPrev.totalIncome > 0 ? prevMarginPct.toFixed(1)+'%' : '—'}</div>
+      </div>
     `;
 
-    const incomeTbody = document.getElementById('fin-income-tbody');
-    incomeTbody.innerHTML = `
-      <tr><td>Doanh thu hợp đồng (${fmt(f.contractCount)} hợp đồng ký trong tháng)</td><td class="num mono-cell" style="color:var(--teal);font-weight:650;">${fmt(f.contractRevenue)}</td></tr>
-      <tr><td>Khoản thu khác (ngoài CRM)</td><td class="num mono-cell" style="color:var(--teal);">${fmt(f.otherIncome)}</td></tr>
-      <tr><td style="font-weight:700;">Tổng thu</td><td class="num mono-cell" style="font-weight:700;color:var(--teal);">${fmt(f.totalIncome)}</td></tr>
+    // ---- Biểu đồ xu hướng Thu - Chi - Lợi nhuận theo đúng kỳ đang chọn ----
+    const curM = currentMonth();
+    const trendBadge = document.getElementById('fin-trend-badge');
+    if(trendBadge) trendBadge.textContent = finChartLabel();
+    const trendItems = finChartMonths().map(m=>{
+      const t = computeFinanceMonth(m);
+      const [yy, mm] = m.split('-');
+      return {label: `${parseInt(mm,10)}/${String(yy).slice(2)}`, thu: t.totalIncome, chi: t.totalExpense, profit: t.profit, bold: m === curM};
+    });
+    document.getElementById('fin-trend-chart').innerHTML = svgFinanceTrendChart(trendItems);
+
+    // ---- Cơ cấu khoản chi (donut): 3 nhóm CRM + khoản lẻ gom theo tên, top 5 + "Khác" ----
+    const EXP_COLORS = ['#D96A7C','#F0A868','#C98F6A','#B58A9A','#E0B0A0','#8A8478'];
+    const manualChiMap = {};
+    f.entries.filter(e=>e.type==='chi').forEach(e=>{
+      const k = String(e.name||'Khoản chi khác').trim();
+      manualChiMap[k] = (manualChiMap[k]||0) + (e.amount||0);
+    });
+    let expItems = [
+      {label:'Lương nhân sự', value:f.salaryCost},
+      {label:'Thưởng & hoa hồng', value:f.bonusCost},
+      {label:'Chi phí marketing', value:f.marketingCost},
+      ...Object.keys(manualChiMap).map(k=>({label:k, value:manualChiMap[k]}))
+    ];
+    expItems = finTopWithOther(expItems, 5).map((it,i)=> ({...it, color: EXP_COLORS[i % EXP_COLORS.length]}));
+    document.getElementById('fin-expense-donut').innerHTML = svgDonutChart(expItems, {fmt: fmtMoneyShort, emptyText:'Chưa có khoản chi trong kỳ.'});
+
+    // ---- Cơ cấu nguồn thu (cột ngang): doanh thu hợp đồng theo gói + khoản thu lẻ ----
+    const INC_COLORS = ['#2E9A67','#6FCF97','#6FA8E8','#3E5FA0','#7EC9A0','#9BB89F'];
+    const manualThuMap = {};
+    f.entries.filter(e=>e.type==='thu').forEach(e=>{
+      const k = String(e.name||'Thu khác').trim();
+      manualThuMap[k] = (manualThuMap[k]||0) + (e.amount||0);
+    });
+    let incItems = [
+      ...Object.keys(f.pkgMap).map(k=>({label:k, value:f.pkgMap[k]})),
+      ...Object.keys(manualThuMap).map(k=>({label:k, value:manualThuMap[k]}))
+    ];
+    incItems = finTopWithOther(incItems, 5).map((it,i)=> ({...it, color: INC_COLORS[i % INC_COLORS.length]}));
+    document.getElementById('fin-income-bar').innerHTML = svgHorizontalBarChart(incItems, {fmt: fmtMoneyShort, labelW: 128, width: 440, emptyText:'Chưa có khoản thu trong kỳ.'});
+
+    // ---- Bảng khoản thu / khoản chi ----
+    document.getElementById('fin-income-tbody').innerHTML = `
+      <tr><td>Doanh thu hợp đồng (${fmt(f.contractCount)} hợp đồng)</td><td class="num mono-cell" style="color:${FIN_GREEN};font-weight:650;">${fmt(f.contractRevenue)}</td><td class="num">${pctOf(f.contractRevenue, f.totalIncome)}</td></tr>
+      <tr><td>Khoản thu khác</td><td class="num mono-cell" style="color:${FIN_GREEN};">${fmt(f.otherIncome)}</td><td class="num">${pctOf(f.otherIncome, f.totalIncome)}</td></tr>
+      <tr><td style="font-weight:700;">Tổng thu</td><td class="num mono-cell" style="font-weight:700;color:${FIN_GREEN};">${fmt(f.totalIncome)}</td><td class="num" style="font-weight:700;">${f.totalIncome > 0 ? '100%' : '—'}</td></tr>
+    `;
+    document.getElementById('fin-expense-tbody').innerHTML = `
+      <tr><td>Lương nhân sự</td><td class="num mono-cell" style="color:var(--red);">${fmt(f.salaryCost)}</td><td class="num">${pctOf(f.salaryCost, f.totalExpense)}</td></tr>
+      <tr><td>Thưởng &amp; hoa hồng</td><td class="num mono-cell" style="color:var(--red);">${fmt(f.bonusCost)}</td><td class="num">${pctOf(f.bonusCost, f.totalExpense)}</td></tr>
+      <tr><td>Chi phí marketing</td><td class="num mono-cell" style="color:var(--red);">${fmt(f.marketingCost)}</td><td class="num">${pctOf(f.marketingCost, f.totalExpense)}</td></tr>
+      <tr><td>Khoản chi khác</td><td class="num mono-cell" style="color:var(--red);">${fmt(f.otherExpense)}</td><td class="num">${pctOf(f.otherExpense, f.totalExpense)}</td></tr>
+      <tr><td style="font-weight:700;">Tổng chi</td><td class="num mono-cell" style="font-weight:700;color:var(--red);">${fmt(f.totalExpense)}</td><td class="num" style="font-weight:700;">${f.totalExpense > 0 ? '100%' : '—'}</td></tr>
     `;
 
-    const expenseTbody = document.getElementById('fin-expense-tbody');
-    expenseTbody.innerHTML = `
-      <tr><td>Lương (theo Bảng lương, gồm phụ cấp, tăng ca &amp; BHXH DN đóng)</td><td class="num mono-cell" style="color:var(--red);">${fmt(f.salaryCost)}</td></tr>
-      <tr><td>Thưởng &amp; hoa hồng</td><td class="num mono-cell" style="color:var(--red);">${fmt(f.bonusCost)}</td></tr>
-      <tr><td>Chi phí marketing</td><td class="num mono-cell" style="color:var(--red);">${fmt(f.marketingCost)}</td></tr>
-      <tr><td>Khoản chi khác (ngoài CRM)</td><td class="num mono-cell" style="color:var(--red);">${fmt(f.otherExpense)}</td></tr>
-      <tr><td style="font-weight:700;">Tổng chi</td><td class="num mono-cell" style="font-weight:700;color:var(--red);">${fmt(f.totalExpense)}</td></tr>
-    `;
+    // ---- Top khoản chi lớn nhất trong kỳ ----
+    const GROUP_PILL = {
+      luong: '<span class="pill grey">Lương</span>',
+      mkt: '<span class="pill amber">Marketing</span>',
+      le: '<span class="pill red">Khoản khác</span>'
+    };
+    let topItems = [
+      ...f.empCost.map(e=>({name:`Lương & thưởng — ${e.name}`, group:'luong', amount:e.amount})),
+      ...f.mktByEmp.map(e=>({name:`Chi phí marketing — ${e.name}`, group:'mkt', amount:e.amount})),
+      ...f.entries.filter(e=>e.type==='chi').map(e=>({name: e.name||'Khoản chi', group:'le', amount: e.amount||0}))
+    ].filter(it=>it.amount>0).sort((a,b)=>b.amount-a.amount).slice(0,10);
+    document.getElementById('fin-top-expense-tbody').innerHTML = topItems.length ? topItems.map((it,i)=>`
+      <tr>
+        <td style="font-weight:800;color:${i<3?'var(--red)':'var(--ink-soft)'};">${i+1}</td>
+        <td style="font-weight:600;">${escapeHtml(it.name)}</td>
+        <td>${GROUP_PILL[it.group]||''}</td>
+        <td class="num mono-cell" style="font-weight:650;color:var(--red);">${fmt(it.amount)}</td>
+        <td class="num">${pctOf(it.amount, f.totalExpense)}</td>
+      </tr>`).join('') : `<tr><td colspan="5" style="text-align:center;color:var(--ink-soft);padding:18px;">Chưa có khoản chi trong kỳ.</td></tr>`;
 
-    // Bảng khoản thu/chi lẻ ngoài CRM
+    // ---- Bảng tổng hợp Thu - Chi - Lợi nhuận theo tháng (12 tháng, mới nhất trên cùng) ----
+    document.getElementById('fin-pivot-tbody').innerHTML = finChartMonths().slice().reverse().map(m=>{
+      const t = computeFinanceMonth(m);
+      const [yy, mm] = m.split('-');
+      const cur = m === curM;
+      const pc = t.profit >= 0 ? FIN_GREEN : 'var(--red)';
+      return `<tr${cur ? ' style="background:rgba(0,0,0,.035);"' : ''}>
+        <td style="font-weight:${cur?'800':'600'};white-space:nowrap;">${parseInt(mm,10)}/${yy}</td>
+        <td class="num mono-cell" style="color:${FIN_GREEN};">${fmt(t.totalIncome)}</td>
+        <td class="num mono-cell" style="color:var(--red);">${fmt(t.totalExpense)}</td>
+        <td class="num mono-cell" style="font-weight:700;color:${pc};">${fmt(t.profit)}</td>
+        <td class="num" style="color:${pc};font-weight:600;">${t.totalIncome > 0 ? (t.profit/t.totalIncome*100).toFixed(1)+'%' : '—'}</td>
+      </tr>`;
+    }).join('');
+
+    // ---- Danh sách khoản thu/chi khác trong kỳ: tìm kiếm (kể cả theo ngày), lọc loại,
+    // lọc khoảng ngày, phân trang — thao tác giống bảng Khách hàng ----
     const manualTbody = document.getElementById('fin-manual-tbody');
-    const manualEmpty = document.getElementById('fin-manual-empty');
-    manualEmpty.style.display = f.entries.length ? 'none' : 'block';
-    manualTbody.innerHTML = f.entries.map(e=>`
+    const q = (finManualSearch||'').toLowerCase().trim();
+    const filtered = f.entries.filter(e=>{
+      if(finManualType && e.type !== finManualType) return false;
+      if(finManualFrom && (e.date||'') < finManualFrom) return false;
+      if(finManualTo && (e.date||'') > finManualTo) return false;
+      if(q && !((e.name||'').toLowerCase().includes(q)
+        || (e.note||'').toLowerCase().includes(q)
+        || (e.createdBy||'').toLowerCase().includes(q)
+        || (e.date||'').includes(q))) return false;
+      return true;
+    });
+    const countEl = document.getElementById('fin-manual-count');
+    if(countEl) countEl.textContent = filtered.length === f.entries.length ? String(f.entries.length) : `${filtered.length}/${f.entries.length}`;
+    const pg = paginate(filtered, finManualPage, PAGE_SIZE);
+    finManualPage = pg.page;
+    document.getElementById('fin-manual-empty').style.display = filtered.length ? 'none' : 'block';
+    manualTbody.innerHTML = pg.pageItems.map(e=>`
       <tr>
         <td class="mono-cell" style="white-space:nowrap;">${escapeHtml(e.date||'—')}</td>
-        <td><span class="pill ${e.type==='thu' ? 'teal' : 'red'}">${e.type==='thu' ? 'Thu' : 'Chi'}</span></td>
+        <td><span class="pill ${e.type==='thu' ? 'green' : 'red'}">${e.type==='thu' ? 'Thu' : 'Chi'}</span></td>
         <td style="font-weight:600;">${escapeHtml(e.name||'')}</td>
-        <td class="num mono-cell" style="font-weight:650;color:${e.type==='thu' ? 'var(--teal)' : 'var(--red)'};">${e.type==='thu' ? '+' : '-'}${fmt(e.amount)}</td>
+        <td class="num mono-cell" style="font-weight:650;color:${e.type==='thu' ? FIN_GREEN : 'var(--red)'};">${e.type==='thu' ? '+' : '-'}${fmt(e.amount)}</td>
+        <td style="color:var(--ink-soft);white-space:nowrap;">${escapeHtml(e.createdBy||'—')}</td>
         <td style="color:var(--ink-soft);">${escapeHtml(e.note||'')}</td>
-        <td style="text-align:right;"><button class="btn danger-ghost sm" data-fin-del="${e.id}">Xoá</button></td>
+        <td style="text-align:right;white-space:nowrap;"><button class="btn ghost sm" data-fin-edit="${e.id}" data-fin-edit-month="${e.month}">Sửa</button> <button class="btn danger-ghost sm" data-fin-del="${e.id}" data-fin-del-month="${e.month}">Xoá</button></td>
       </tr>
     `).join('');
+    renderPagination(document.getElementById('fin-manual-pagination'), pg.page, pg.totalPages, p=>{ finManualPage = p; renderFinance(); });
+    $$('[data-fin-edit]', manualTbody).forEach(btn=>{
+      btn.addEventListener('click', ()=> startEditFinEntry(btn.getAttribute('data-fin-edit-month'), btn.getAttribute('data-fin-edit')));
+    });
     $$('[data-fin-del]', manualTbody).forEach(btn=>{
       btn.addEventListener('click', async ()=>{
         if(!await showConfirmDialog('Xoá khoản thu/chi này?')) return;
-        await deleteFinEntry(m, btn.getAttribute('data-fin-del'));
+        const delMonth = btn.getAttribute('data-fin-del-month'), delId = btn.getAttribute('data-fin-del');
+        await deleteFinEntry(delMonth, delId);
+        if(editingFinEntry && editingFinEntry.id === delId) resetFinEntryForm();
         renderFinance();
-        renderReport();
         toast('Đã xoá khoản thu/chi');
       });
     });
+  }
 
-    // Ngày mặc định của form: hôm nay nếu đang xem đúng tháng hiện tại, ngược lại ngày 01 của tháng đang xem
+  // ---------- Thêm / sửa khoản thu-chi khác (form hộp thoại + bộ lọc, thao tác giống tab Khách hàng) ----------
+  let editingFinEntry = null; // {month, id, time, createdBy} — đang sửa khoản nào
+  let finManualSearch = '', finManualType = '', finManualFrom = '', finManualTo = '', finManualPage = 1;
+  function openFinEntryModal(){
+    const ov = document.getElementById('fin-entry-modal-overlay');
+    if(ov) ov.style.display = 'flex';
+  }
+  function closeFinEntryModal(){
+    const ov = document.getElementById('fin-entry-modal-overlay');
+    if(ov) ov.style.display = 'none';
+  }
+  function resetFinEntryForm(){
+    editingFinEntry = null;
+    $('#fe-type').value = 'chi';
+    $('#fe-name').value = ''; $('#fe-amount').value = ''; $('#fe-note').value = '';
+    document.getElementById('fin-entry-form-title').textContent = 'Thêm khoản thu / chi';
+    document.getElementById('btn-add-fin-entry').textContent = '+ Lưu khoản';
     const feDate = document.getElementById('fe-date');
-    if(feDate && !feDate.value){
+    if(feDate){
+      const curM = currentMonth();
       const todayISO = new Date().toISOString().slice(0,10);
-      feDate.value = todayISO.slice(0,7) === m ? todayISO : (m + '-01');
+      feDate.value = todayISO.slice(0,7) === curM ? todayISO : (curM + '-01');
     }
   }
-
-  // Bảng báo cáo tài chính trên Dashboard — tính theo KỲ đang xem (tháng/quý/năm), chỉ hiện với Giám đốc.
-  function renderFinanceDashboard(){
-    const card = document.getElementById('report-finance-card');
-    if(!card) return;
-    const role = currentUser ? currentUser.role : null;
-    if(role !== 'giamdoc'){ card.style.display = 'none'; return; }
-    card.style.display = '';
-    const f = computeFinanceForMonths(rptPeriodMonths());
-    const pctOf = (v, total) => total > 0 ? (v/total*100).toFixed(0)+'%' : '—';
-    const profitColor = f.profit >= 0 ? 'var(--teal)' : 'var(--red)';
-    document.getElementById('report-finance-tbody').innerHTML = `
-      <tr><td style="font-weight:700;">💰 TỔNG THU</td><td class="num mono-cell" style="font-weight:700;color:var(--teal);">${fmt(f.totalIncome)}</td><td class="num">100%</td></tr>
-      <tr><td style="padding-left:22px;">Doanh thu hợp đồng (${fmt(f.contractCount)} hợp đồng)</td><td class="num mono-cell">${fmt(f.contractRevenue)}</td><td class="num">${pctOf(f.contractRevenue, f.totalIncome)}</td></tr>
-      <tr><td style="padding-left:22px;">Khoản thu khác (ngoài CRM)</td><td class="num mono-cell">${fmt(f.otherIncome)}</td><td class="num">${pctOf(f.otherIncome, f.totalIncome)}</td></tr>
-      <tr><td style="font-weight:700;">💸 TỔNG CHI</td><td class="num mono-cell" style="font-weight:700;color:var(--red);">${fmt(f.totalExpense)}</td><td class="num">100%</td></tr>
-      <tr><td style="padding-left:22px;">Lương (gồm BHXH DN đóng)</td><td class="num mono-cell">${fmt(f.salaryCost)}</td><td class="num">${pctOf(f.salaryCost, f.totalExpense)}</td></tr>
-      <tr><td style="padding-left:22px;">Thưởng &amp; hoa hồng</td><td class="num mono-cell">${fmt(f.bonusCost)}</td><td class="num">${pctOf(f.bonusCost, f.totalExpense)}</td></tr>
-      <tr><td style="padding-left:22px;">Chi phí marketing</td><td class="num mono-cell">${fmt(f.marketingCost)}</td><td class="num">${pctOf(f.marketingCost, f.totalExpense)}</td></tr>
-      <tr><td style="padding-left:22px;">Khoản chi khác (ngoài CRM)</td><td class="num mono-cell">${fmt(f.otherExpense)}</td><td class="num">${pctOf(f.otherExpense, f.totalExpense)}</td></tr>
-      <tr><td style="font-weight:800;">${f.profit >= 0 ? '📈 LỢI NHUẬN' : '📉 LỖ'}</td><td class="num mono-cell" style="font-weight:800;color:${profitColor};">${fmt(f.profit)}</td><td class="num" style="color:${profitColor};font-weight:700;">${f.totalIncome>0 ? (f.profit/f.totalIncome*100).toFixed(1)+'%' : '—'}</td></tr>
-    `;
-    document.getElementById('report-finance-note').textContent =
-      `Kỳ ${rptPeriodLabel()} — Thu lấy từ doanh thu hợp đồng theo ngày ký; Chi lấy từ bảng lương (lương, thưởng, hoa hồng), chi phí marketing và các khoản nhập tay ở tab "Báo cáo tài chính".`;
+  function startEditFinEntry(month, id){
+    const e = (financeByMonth[month]||{})[id];
+    if(!e) return;
+    editingFinEntry = {month, id, time: e.time || Date.now(), createdBy: e.createdBy || ''};
+    $('#fe-type').value = e.type === 'thu' ? 'thu' : 'chi';
+    $('#fe-name').value = e.name || '';
+    $('#fe-amount').value = e.amount ? fmt(e.amount) : '';
+    $('#fe-date').value = e.date || '';
+    $('#fe-note').value = e.note || '';
+    document.getElementById('fin-entry-form-title').textContent = 'Sửa khoản thu / chi';
+    document.getElementById('btn-add-fin-entry').textContent = 'Cập nhật khoản';
+    openFinEntryModal();
   }
-
+  document.getElementById('btn-open-fin-entry-modal').addEventListener('click', ()=>{ resetFinEntryForm(); openFinEntryModal(); });
+  document.getElementById('fin-entry-modal-close').addEventListener('click', ()=>{ resetFinEntryForm(); closeFinEntryModal(); });
+  document.getElementById('btn-cancel-fin-edit').addEventListener('click', ()=>{ resetFinEntryForm(); closeFinEntryModal(); });
+  document.getElementById('fin-entry-modal-overlay').addEventListener('click', (e)=>{
+    if(e.target === e.currentTarget){ resetFinEntryForm(); closeFinEntryModal(); }
+  });
+  // Bộ lọc bảng khoản thu/chi khác
+  document.getElementById('fin-manual-search').addEventListener('input', (e)=>{ finManualSearch = e.target.value; finManualPage = 1; renderFinance(); });
+  document.getElementById('fin-manual-type-filter').addEventListener('change', (e)=>{ finManualType = e.target.value; finManualPage = 1; renderFinance(); });
+  document.getElementById('fin-manual-from').addEventListener('change', (e)=>{ finManualFrom = e.target.value; finManualPage = 1; renderFinance(); });
+  document.getElementById('fin-manual-to').addEventListener('change', (e)=>{ finManualTo = e.target.value; finManualPage = 1; renderFinance(); });
+  document.getElementById('fin-manual-filter-clear').addEventListener('click', ()=>{
+    finManualSearch = ''; finManualType = ''; finManualFrom = ''; finManualTo = ''; finManualPage = 1;
+    document.getElementById('fin-manual-search').value = '';
+    document.getElementById('fin-manual-type-filter').value = '';
+    document.getElementById('fin-manual-from').value = '';
+    document.getElementById('fin-manual-to').value = '';
+    renderFinance();
+  });
   document.getElementById('btn-add-fin-entry').addEventListener('click', async ()=>{
     const name = $('#fe-name').value.trim();
     const amount = moneyNum($('#fe-amount').value);
     if(!name || !amount){ toast('Vui lòng nhập tên khoản và số tiền'); return; }
     const type = $('#fe-type').value === 'thu' ? 'thu' : 'chi';
     const date = $('#fe-date').value || (currentMonth() + '-01');
-    const month = date.slice(0,7); // khoản thuộc về tháng của NGÀY đã chọn (có thể khác tháng đang xem)
-    const id = 'fe' + Date.now() + Math.floor(Math.random()*1000);
-    const entry = { type, name, amount, date, note: $('#fe-note').value.trim(), time: Date.now() };
-    if(!financeByMonth[month]) financeByMonth[month] = {};
-    financeByMonth[month][id] = entry;
-    await patchFinEntry(month, id, entry);
-    $('#fe-name').value=''; $('#fe-amount').value=''; $('#fe-note').value='';
-    toast(month !== currentMonth()
-      ? `Đã thêm khoản ${type==='thu'?'thu':'chi'} vào tháng ${month} (khác tháng đang xem)`
-      : `Đã thêm khoản ${type==='thu'?'thu':'chi'}`);
+    const month = date.slice(0,7); // khoản thuộc về tháng của NGÀY đã chọn
+    const meName = (currentUser && (currentUser.name || currentUser.username)) || '';
+    if(editingFinEntry){
+      const {month: oldMonth, id, time, createdBy} = editingFinEntry;
+      // Giữ nguyên người tạo gốc khi sửa
+      const entry = { type, name, amount, date, note: $('#fe-note').value.trim(), time: time || Date.now(), createdBy: createdBy || meName };
+      // Đổi ngày sang THÁNG KHÁC: gỡ khỏi tháng cũ trước rồi mới ghi vào đúng tháng mới
+      if(month !== oldMonth) await deleteFinEntry(oldMonth, id);
+      if(!financeByMonth[month]) financeByMonth[month] = {};
+      financeByMonth[month][id] = entry;
+      await patchFinEntry(month, id, entry);
+      toast('Đã cập nhật khoản thu/chi');
+    } else {
+      const id = 'fe' + Date.now() + Math.floor(Math.random()*1000);
+      const entry = { type, name, amount, date, note: $('#fe-note').value.trim(), time: Date.now(), createdBy: meName };
+      if(!financeByMonth[month]) financeByMonth[month] = {};
+      financeByMonth[month][id] = entry;
+      await patchFinEntry(month, id, entry);
+      toast(`Đã thêm khoản ${type==='thu'?'thu':'chi'}`);
+    }
+    resetFinEntryForm();
+    closeFinEntryModal();
     renderFinance();
-    renderReport();
   });
 
   function renderAll(){
@@ -11891,6 +12286,7 @@ Bằng việc thực hiện xác nhận điện tử bên dưới, Bên B xác n
     renderPlan();
     renderReport();
     renderPayroll();
+    renderFinance();
     document.getElementById('payslip-holder').innerHTML='';
   });
 
