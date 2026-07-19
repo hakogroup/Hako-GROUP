@@ -1800,6 +1800,7 @@
         </div>
 
         <div class="cc-tab" data-tab="com"><span class="ico ico-fuchsia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r=".6" fill="currentColor" stroke="none"/></svg></span>Hoa hồng / KPI</div>
+        <div class="cc-tab" data-tab="fin"><span class="ico ico-gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M9.5 20V4M15 20v-7M20 20V8"/><path d="M3 20h18"/><circle cx="9.5" cy="4" r="0" fill="currentColor" stroke="none"/></svg></span>Báo cáo tài chính</div>
         <div class="cc-tab" data-tab="set"><span class="ico ico-gray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/></svg></span>Cài đặt chung</div>
       </nav>
       <div class="sidebar-foot">
@@ -1877,6 +1878,13 @@
               <select id="f-lead-dept">
                 <option value="sales">Sales</option>
                 <option value="marketing">Marketing</option>
+              </select>
+            </div>
+            <div class="cc-field" id="f-salary-mode-field" style="display:none;">
+              <label>Cách tính lương (Sales)</label>
+              <select id="f-salary-mode" style="min-width:220px;">
+                <option value="kpi">Theo KPI doanh thu (mặc định)</option>
+                <option value="fixed">Lương cứng — không áp KPI</option>
               </select>
             </div>
             <div class="cc-field"><label>Loại nhân sự</label>
@@ -2487,6 +2495,18 @@
 
       <div class="rpt-kpi-strip" id="report-summary"></div>
 
+      <!-- Báo cáo tài chính (Thu - Chi) — chỉ hiện với tài khoản Giám đốc -->
+      <div class="rpt-card report-card" id="report-finance-card" style="margin-bottom:14px;display:none;">
+        <h3><span class="rpt-h3-ico teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 9.5v0M18 14.5v0"/></svg></span>Báo cáo tài chính (Thu – Chi) <span class="rpt-dept-badge sales">Tài chính</span></h3>
+        <div class="tbl-scroll">
+          <table class="funnel-stage-table">
+            <thead><tr><th>Khoản mục</th><th class="num">Số tiền (đ)</th><th class="num">Tỉ trọng</th></tr></thead>
+            <tbody id="report-finance-tbody"></tbody>
+          </table>
+        </div>
+        <p class="sub" id="report-finance-note" style="margin:8px 0 0;"></p>
+      </div>
+
       <!-- Hàng A: Doanh thu công ty | Xếp hạng doanh số / Hợp đồng — song song 1x1 -->
       <div class="rpt-grid-2">
         <div class="rpt-card report-card">
@@ -3063,6 +3083,66 @@
       <div id="payslip-holder"></div>
     </div>
 
+    <!-- FINANCE REPORT -->
+    <div class="cc-panel" id="panel-fin">
+      <div class="page-head">
+        <div class="ph-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M9.5 20V4M15 20v-7M20 20V8"/><path d="M3 20h18"/></svg></div>
+        <div class="ph-text"><h1>Báo cáo tài chính</h1></div>
+      </div>
+      <p class="sub" style="margin:-6px 0 12px;">Khoản thu lấy tự động từ <strong>doanh thu hợp đồng</strong> (theo ngày ký). Khoản chi gồm <strong>lương</strong>, <strong>thưởng &amp; hoa hồng</strong> (từ bảng lương) và <strong>chi phí marketing</strong> (nhập ở tab Hoa hồng / KPI của bộ phận Marketing). Các khoản nhỏ lẻ ngoài CRM nhập thêm ở mục cuối trang. Dữ liệu tính theo tháng đang chọn ở góc trên.</p>
+
+      <div class="cc-summary" id="fin-summary"></div>
+
+      <div class="rpt-grid-2">
+        <div class="cc-card" style="padding:0;overflow:hidden;">
+          <div style="padding:16px 18px 4px;"><h2>Khoản thu — tháng <span class="month-label"></span></h2></div>
+          <div class="tbl-scroll">
+            <table>
+              <thead><tr><th>Khoản mục</th><th class="num">Số tiền (đ)</th></tr></thead>
+              <tbody id="fin-income-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="cc-card" style="padding:0;overflow:hidden;">
+          <div style="padding:16px 18px 4px;"><h2>Khoản chi — tháng <span class="month-label"></span></h2></div>
+          <div class="tbl-scroll">
+            <table>
+              <thead><tr><th>Khoản mục</th><th class="num">Số tiền (đ)</th></tr></thead>
+              <tbody id="fin-expense-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="cc-card">
+        <h2>Khoản thu / chi nhỏ lẻ ngoài CRM — tháng <span class="month-label"></span></h2>
+        <p class="sub">Dùng cho các khoản không có sẵn trong hệ thống (VD: tiền điện nước, văn phòng phẩm, thu thanh lý...). Các khoản này sẽ tự cộng vào bảng thu/chi ở trên.</p>
+        <div class="cc-row" style="align-items:flex-end;">
+          <div class="cc-field"><label>Loại</label>
+            <select id="fe-type" style="min-width:110px;">
+              <option value="chi">Khoản chi</option>
+              <option value="thu">Khoản thu</option>
+            </select>
+          </div>
+          <div class="cc-field"><label>Tên khoản</label><input id="fe-name" placeholder="VD: Tiền điện tháng này" style="min-width:200px;"/></div>
+          <div class="cc-field"><label>Số tiền (đ)</label><input id="fe-amount" type="text" inputmode="numeric" data-money placeholder="0" style="min-width:130px;"/></div>
+          <div class="cc-field"><label>Ngày</label><input id="fe-date" type="date" style="min-width:140px;"/></div>
+          <div class="cc-field"><label>Ghi chú</label><input id="fe-note" placeholder="(không bắt buộc)" style="min-width:180px;"/></div>
+          <button class="btn" id="btn-add-fin-entry" type="button">+ Thêm khoản</button>
+        </div>
+        <div class="tbl-scroll" style="margin-top:12px;">
+          <table>
+            <thead><tr><th>Ngày</th><th>Loại</th><th>Tên khoản</th><th class="num">Số tiền (đ)</th><th>Ghi chú</th><th></th></tr></thead>
+            <tbody id="fin-manual-tbody"></tbody>
+          </table>
+        </div>
+        <div class="empty" id="fin-manual-empty" style="display:none;">
+          <div class="big">🧾</div>
+          Chưa có khoản thu/chi lẻ nào trong tháng này.
+        </div>
+      </div>
+    </div>
+
     <!-- SETTINGS -->
     <div class="cc-panel" id="panel-set">
       <div class="page-head">
@@ -3252,6 +3332,19 @@
             <div class="re-label">Thưởng hiệu suất mặc định (áp dụng tạm cho ai CHƯA đặt riêng — đặt riêng từng người ở tab "Hoa hồng &amp; KPI")</div>
             <input type="text" inputmode="numeric" data-money id="rate-sales-perf"/><span class="re-suffix">đ / tháng</span>
           </div>
+        </div>
+
+        <div class="rate-block">
+          <h3>Sales — lương theo KPI doanh thu (áp dụng cho phần lương theo công)</h3>
+          <p class="sub" style="margin:0 0 6px;">
+            Nhân viên Sales <strong>không</strong> chọn "Lương cứng" (chọn ở form Nhân sự) sẽ được tính lương theo KPI:
+            đạt đủ KPI gốc → nhận 100% lương theo công; về được từ mức % dưới đây trở lên (nhưng chưa đủ KPI) → nhận theo tỉ lệ 1; về dưới mức đó → nhận theo tỉ lệ 2.
+            Hoa hồng, thưởng, phụ cấp, tăng ca không bị ảnh hưởng.
+          </p>
+          <div class="rate-editor-row"><div class="re-label">KPI gốc (doanh thu tháng)</div><input type="text" inputmode="numeric" data-money id="rate-sales-kpi-base"/><span class="re-suffix">đ</span></div>
+          <div class="rate-editor-row"><div class="re-label">Ngưỡng % KPI để hưởng tỉ lệ 1</div><input type="number" id="rate-sales-kpi-mid-th"/><span class="re-suffix">%</span></div>
+          <div class="rate-editor-row"><div class="re-label">Tỉ lệ 1 — đạt từ ngưỡng trên đến dưới 100% KPI</div><input type="number" id="rate-sales-kpi-mid-factor"/><span class="re-suffix">% lương</span></div>
+          <div class="rate-editor-row"><div class="re-label">Tỉ lệ 2 — dưới ngưỡng</div><input type="number" id="rate-sales-kpi-low-factor"/><span class="re-suffix">% lương</span></div>
         </div>
 
         <div class="rate-block">
@@ -3697,6 +3790,7 @@
   let lateEarlyByMonth = {}; // { 'YYYY-MM': { empId: { 'YYYY-MM-DD': 'lateT1'|'lateT2'|'lateT3'|'earlyT1'|'earlyT2'|'earlyT3' } } }
   let checkInByMonth = {}; // { 'YYYY-MM': { empId: { 'YYYY-MM-DD': {in:'08:15', out:'17:20'} } } } — lịch sử giờ tự chấm công thực tế
   let dailyByMonth = {}; // { 'YYYY-MM': { empId: { 'YYYY-MM-DD': {revenue,calls,contracts,potential,leads} } } }
+  let financeByMonth = {}; // { 'YYYY-MM': { entryId: {type:'thu'|'chi', name, amount, date, note, time} } } — khoản thu/chi lẻ ngoài CRM
   let weeklyPlanByMonth = {}; // { 'YYYY-MM': { empId: { weekIdx: {target: number|null, actual: number|null} } } } — null = dùng giá trị tự tính
   let editingId = null;
   let commSearchTerm = '';
@@ -3807,7 +3901,13 @@
     cskhThreshold: 100,
     marketingTiers: [[200,2500000],[180,1800000],[150,1200000],[120,700000],[100,500000]],
     leadMarketingTiers: [[200,5000000],[150,3000000],[120,2000000],[100,1000000]],
-    salesPerfBonus: 1000000
+    salesPerfBonus: 1000000,
+    // Lương theo KPI của Sales: KPI gốc 20tr — đạt đủ nhận 100% lương theo công;
+    // về được >= 50% KPI (nhưng chưa đủ) nhận 85%; về dưới 50% KPI nhận 50%.
+    salesKpiBase: 20000000,
+    salesKpiMidThreshold: 50,
+    salesKpiMidFactor: 85,
+    salesKpiLowFactor: 50
   };
 
   const ALLOW_TYPE_ORDER = ['chinhthuc','thuviec','partime'];
@@ -4097,7 +4197,7 @@
   // ---------- persistence ----------
   const ALL_STORAGE_KEYS = ['employees','attendance-by-month','commission-by-month','calendar-by-month',
     'lateearly-by-month','checkin-by-month','daily-by-month','weekly-plan-by-month',
-    'customer-contracts','customer-leads','cskh-calls','notifications','settings','tasks','contract-drafts'];
+    'customer-contracts','customer-leads','cskh-calls','notifications','settings','tasks','contract-drafts','finance-by-month'];
   // Dọn dẹp TRỰC TIẾP các bản ghi bị lỗi "id" rỗng (null/undefined/'') trong 1 danh sách — gộp các bản ghi
   // trùng (do bug cũ tạo ra nhiều bản) thành ĐÚNG 1 bản duy nhất (giữ lại notes của tất cả, ghép làm 1),
   // gán ID mới, rồi GHI THẲNG (không qua saveListMerged/merge — để tránh đúng lỗi "phục hồi lại bản cũ"
@@ -4183,6 +4283,7 @@
     if(keys.includes('lateearly-by-month')) try{ lateEarlyByMonth = raw['lateearly-by-month'] ? JSON.parse(raw['lateearly-by-month'].value) : {}; }catch(err){ lateEarlyByMonth = {}; }
     if(keys.includes('checkin-by-month')) try{ checkInByMonth = raw['checkin-by-month'] ? JSON.parse(raw['checkin-by-month'].value) : {}; }catch(err){ checkInByMonth = {}; }
     if(keys.includes('daily-by-month')) try{ dailyByMonth = raw['daily-by-month'] ? JSON.parse(raw['daily-by-month'].value) : {}; }catch(err){ dailyByMonth = {}; }
+    if(keys.includes('finance-by-month')) try{ financeByMonth = raw['finance-by-month'] ? JSON.parse(raw['finance-by-month'].value) : {}; }catch(err){ financeByMonth = {}; }
     if(keys.includes('weekly-plan-by-month')) try{ weeklyPlanByMonth = raw['weekly-plan-by-month'] ? JSON.parse(raw['weekly-plan-by-month'].value) : {}; }catch(err){ weeklyPlanByMonth = {}; }
     if(keys.includes('customer-contracts')) try{ customerContracts = raw['customer-contracts'] ? JSON.parse(raw['customer-contracts'].value) : []; }catch(err){ customerContracts = []; }
     if(keys.includes('customer-leads')) try{ customerLeads = raw['customer-leads'] ? JSON.parse(raw['customer-leads'].value) : []; }catch(err){ customerLeads = []; }
@@ -4458,6 +4559,34 @@
   }
   async function saveDaily(){ await saveTreeMerged('daily-by-month', ()=>dailyByMonth, v=>{ dailyByMonth=v; }, 'Lỗi lưu chỉ số theo ngày'); }
   async function saveWeeklyPlan(){ await saveTreeMerged('weekly-plan-by-month', ()=>weeklyPlanByMonth, v=>{ weeklyPlanByMonth=v; }, 'Lỗi lưu mục tiêu theo tuần'); }
+  // ---------- Báo cáo tài chính: khoản thu/chi lẻ ngoài CRM ----------
+  // Lưu dạng cây { 'YYYY-MM': { entryId: {...} } } — thêm/sửa vá đúng 1 nhánh [tháng, id] (an toàn khi
+  // nhiều người cùng nhập), xoá thì đọc bản MỚI NHẤT trên server rồi gỡ đúng 1 id (không ghi đè cả khối).
+  function finEntriesOfMonth(m){
+    const node = financeByMonth[m] || {};
+    return Object.keys(node)
+      .filter(id => node[id] && typeof node[id] === 'object')
+      .map(id => ({ id, ...node[id] }))
+      .sort((a,b)=> String(a.date||'').localeCompare(String(b.date||'')) || (a.time||0)-(b.time||0));
+  }
+  function patchFinEntry(month, id, fieldsObj){
+    return patchTreeFields('finance-by-month', financeByMonth, [month, id], fieldsObj);
+  }
+  function deleteFinEntry(month, id){
+    const key = 'finance-by-month';
+    const prev = __patchQueues[key] || Promise.resolve();
+    const run = prev.then(async ()=>{
+      try{
+        let remote = {};
+        try{ const r = await window.storage.get(key); remote = r ? JSON.parse(r.value) : {}; }catch(_){ remote = {}; }
+        if(remote[month]) delete remote[month][id];
+        await window.storage.set(key, JSON.stringify(remote), false);
+        financeByMonth = remote;
+      }catch(err){ toast('Lỗi xoá khoản thu/chi'); }
+    });
+    __patchQueues[key] = run.catch(()=>{});
+    return run;
+  }
   async function saveContracts(){ await saveListMerged('customer-contracts', ()=>customerContracts, v=>{ customerContracts=v; }, 'Lỗi lưu hợp đồng khách hàng'); }
   async function saveLeads(){ await saveListMerged('customer-leads', ()=>customerLeads, v=>{ customerLeads=v; }, 'Lỗi lưu dữ liệu khách hàng'); }
   async function saveCskhCalls(){ await saveListMerged('cskh-calls', ()=>cskhCalls, v=>{ cskhCalls=v; }, 'Lỗi lưu nhật ký chăm sóc khách hàng'); }
@@ -5632,7 +5761,33 @@
     const dailyWage = stdDays ? emp.basicSalary / stdDays : 0;
     const hourlyWage = settings.hours ? dailyWage / settings.hours : 0;
 
-    const workDayPay = dailyWage * ((att.actualDays||0) + (att.leavePaid||0));
+    const baseWorkDayPay = dailyWage * ((att.actualDays||0) + (att.leavePaid||0));
+    // Lương theo KPI của Sales: nếu nhân viên KHÔNG chọn "Lương cứng" thì phần lương theo công được
+    // nhân theo tỉ lệ đạt KPI gốc (mặc định 20tr): đủ KPI → 100%; về >= 50% KPI → 85%; dưới 50% → 50%.
+    // Chỉ áp cho lương theo công — hoa hồng/thưởng/phụ cấp/tăng ca giữ nguyên.
+    let workDayPay = baseWorkDayPay;
+    let kpiSalary = null;
+    if(emp.position === 'sales' && (emp.salaryMode || 'kpi') !== 'fixed'){
+      const rates = (settings.commission) || DEFAULT_COMMISSION;
+      const kpiBase = rates.salesKpiBase ?? DEFAULT_COMMISSION.salesKpiBase;
+      const midTh = rates.salesKpiMidThreshold ?? DEFAULT_COMMISSION.salesKpiMidThreshold;
+      const midF = (rates.salesKpiMidFactor ?? DEFAULT_COMMISSION.salesKpiMidFactor) / 100;
+      const lowF = (rates.salesKpiLowFactor ?? DEFAULT_COMMISSION.salesKpiLowFactor) / 100;
+      const kpiRevenue = (comm && comm.revenue) || 0;
+      const kpiPct = kpiBase > 0 ? (kpiRevenue / kpiBase * 100) : 100;
+      let factor = 1;
+      if(kpiPct < 100) factor = (kpiPct >= midTh) ? midF : lowF;
+      workDayPay = baseWorkDayPay * factor;
+      kpiSalary = {
+        applied: factor < 1,
+        base: kpiBase,
+        revenue: kpiRevenue,
+        pct: kpiPct,
+        factor,
+        deduction: baseWorkDayPay - workDayPay
+      };
+    }
+
     const otPay = hourlyWage * ((att.otWeekday||0)*1.5 + (att.otWeekend||0)*2 + (att.otHoliday||0)*3);
     const latePenalty = latePenaltyAmount(att, dailyWage);
     const fixedAllowance = emp.allowance || 0;
@@ -5665,7 +5820,7 @@
     // (phần này công ty đóng thêm, không trừ vào lương của người lao động).
     const totalCompanyCost = gross + employerInsurance;
 
-    return { dailyWage, workDayPay, otPay, latePenalty, allowance, fixedAllowance, allowanceBreakdown, dailyAllowanceTotal, bonus, otherDeduction, commissionAmount, gross, insurance, employerInsurance, totalCompanyCost, preTax, familyDed, taxable, tax, net };
+    return { dailyWage, workDayPay, baseWorkDayPay, kpiSalary, otPay, latePenalty, allowance, fixedAllowance, allowanceBreakdown, dailyAllowanceTotal, bonus, otherDeduction, commissionAmount, gross, insurance, employerInsurance, totalCompanyCost, preTax, familyDed, taxable, tax, net };
   }
 
   // ---------- render: employees ----------
@@ -5775,6 +5930,7 @@
             <div><span class="lbl">Phụ cấp cố định</span><span class="val mono-cell">${fmt(emp.allowance)}đ</span></div>
             <div><span class="lbl">Ngày công chuẩn</span><span class="val mono-cell">${emp.standardDays}</span></div>
             <div><span class="lbl">Người phụ thuộc</span><span class="val mono-cell">${emp.dependents}</span></div>
+            ${emp.position==='sales' ? `<div><span class="lbl">Cách tính lương</span><span class="val">${(emp.salaryMode||'kpi')==='fixed' ? '🔒 Lương cứng (không áp KPI)' : '📊 Theo KPI doanh thu'}</span></div>` : ''}
             <div><span class="lbl">Ngân hàng</span><span class="val">${escapeHtml(emp.bankName||'—')}</span></div>
             <div><span class="lbl">Số tài khoản</span><span class="val mono-cell">${escapeHtml(emp.bankAccount||'—')}</span></div>
             <div><span class="lbl">Tên chủ tài khoản</span><span class="val">${escapeHtml(emp.bankHolder||'—')}</span></div>
@@ -5854,6 +6010,7 @@
     if(!Array.isArray(leadIds)) leadIds = [];
     renderEmpLeadEmpList($('#f-lead-dept').value, leadIds);
     $('#f-emp-type').value = emp.empType || 'chinhthuc';
+    $('#f-salary-mode').value = emp.salaryMode || 'kpi';
     $('#f-start-date').value = emp.startDate || '';
     $('#f-end-date').value = emp.endDate || '';
     pendingContractFile = emp.contractFile || null;
@@ -5899,6 +6056,7 @@
     applyEmpLeadFieldVisibility('sales');
     renderEmpLeadEmpList('sales', []);
     $('#f-emp-type').value = 'thuviec';
+    $('#f-salary-mode').value = 'kpi';
     $('#f-start-date').value = '';
     $('#f-end-date').value = '';
     $('#f-contract-file').value = '';
@@ -5913,6 +6071,8 @@
     const show = position === 'lead';
     document.getElementById('f-lead-dept-field').style.display = show ? '' : 'none';
     document.getElementById('f-lead-emp-field').style.display = show ? '' : 'none';
+    const smField = document.getElementById('f-salary-mode-field');
+    if(smField) smField.style.display = position === 'sales' ? '' : 'none';
   }
   function renderEmpLeadEmpList(dept, checkedIds){
     const listEl = document.getElementById('f-lead-emp-list');
@@ -9627,6 +9787,7 @@ Bằng việc thực hiện xác nhận điện tử bên dưới, Bên B xác n
     const rptTitleEl = document.getElementById('rpt-period-title');
     if(rptTitleEl) rptTitleEl.textContent = rptPeriodLabel();
     renderSalesHero();
+    renderFinanceDashboard();
     renderMarketingKpi();
     renderBestSales();
     renderFirstDealTime();
@@ -11396,6 +11557,8 @@ Bằng việc thực hiện xác nhận điện tử bên dưới, Bên B xác n
         detailTr.innerHTML = `<td colspan="3">
           <div class="emp-detail-grid">
             <div><span class="lbl">Lương theo công</span><span class="val mono-cell">${fmt(p.workDayPay)}</span></div>
+            ${p.kpiSalary && p.kpiSalary.applied ? `<div><span class="lbl">Điều chỉnh lương theo KPI (đạt ${p.kpiSalary.pct.toFixed(0)}% KPI ${fmt(p.kpiSalary.base)}đ → nhận ${(p.kpiSalary.factor*100).toFixed(0)}%)</span><span class="val mono-cell" style="color:var(--red);">-${fmt(p.kpiSalary.deduction)}</span></div>` : ''}
+            ${emp.position==='sales' && (emp.salaryMode||'kpi')==='fixed' ? `<div><span class="lbl">Cách tính lương</span><span class="val">Lương cứng (không áp KPI)</span></div>` : ''}
             <div><span class="lbl">Phụ cấp</span><span class="val mono-cell">${fmt(p.allowance)}</span></div>
             <div><span class="lbl">Tăng ca</span><span class="val mono-cell">${fmt(p.otPay)}</span></div>
             <div><span class="lbl">Hoa hồng</span><span class="val mono-cell">${fmt(p.commissionAmount)}</span></div>
@@ -11449,7 +11612,9 @@ Bằng việc thực hiện xác nhận điện tử bên dưới, Bên B xác n
           <div class="ps-line"><span>Tên chủ tài khoản</span><span>${escapeHtml(emp.bankHolder||emp.name||'—')}</span></div>
         </div>` : ''}
         <div class="ps-body">
-          <div class="ps-line add"><span>Lương theo công (${att.actualDays}+${att.leavePaid} ngày)</span><span>${fmt(p.workDayPay)}</span></div>
+          <div class="ps-line add"><span>Lương theo công (${att.actualDays}+${att.leavePaid} ngày)${p.kpiSalary && p.kpiSalary.applied ? ` — gốc ${fmt(p.baseWorkDayPay)}đ` : ''}</span><span>${fmt(p.workDayPay)}</span></div>
+          ${p.kpiSalary && p.kpiSalary.applied ? `<div class="ps-line deduct" style="padding-left:14px;font-size:12px;"><span>— Điều chỉnh theo KPI: doanh thu ${fmt(p.kpiSalary.revenue)}đ / KPI gốc ${fmt(p.kpiSalary.base)}đ = ${p.kpiSalary.pct.toFixed(0)}% → nhận ${(p.kpiSalary.factor*100).toFixed(0)}% lương theo công</span><span>-${fmt(p.kpiSalary.deduction)}</span></div>` : ''}
+          ${emp.position==='sales' && (emp.salaryMode||'kpi')==='fixed' ? `<div class="ps-line add" style="padding-left:14px;font-size:12px;"><span>— Lương cứng: không áp điều chỉnh KPI</span><span></span></div>` : ''}
           <div class="ps-line" style="font-weight:650;"><span>Phụ cấp</span><span>${fmt(p.allowance)}</span></div>
           ${p.fixedAllowance ? `<div class="ps-line add" style="padding-left:14px;font-size:12px;"><span>— Phụ cấp cố định khác</span><span>${fmt(p.fixedAllowance)}</span></div>` : ''}
           ${p.allowanceBreakdown.filter(a=>a.perDay>0).map(a=>`<div class="ps-line add" style="padding-left:14px;font-size:12px;"><span>— ${a.name} (${fmt(a.perDay)}đ × ${a.days} ngày công)</span><span>${fmt(a.total)}</span></div>`).join('')}
@@ -11476,6 +11641,165 @@ Bằng việc thực hiện xác nhận điện tử bên dưới, Bên B xác n
     document.getElementById('ps-close').addEventListener('click', ()=> holder.innerHTML='');
   }
 
+  // ---------- Báo cáo tài chính (Thu - Chi) ----------
+  // Nhân viên có làm việc trong tháng m không (tránh cộng chi phí lương của người đã nghỉ từ trước
+  // hoặc chưa nhận việc vào báo cáo tài chính của tháng đó).
+  function finEmpActiveInMonth(emp, m){
+    if(emp.endDate && emp.endDate < (m + '-01')) return false;
+    if(emp.startDate && emp.startDate.slice(0,7) > m) return false;
+    return true;
+  }
+  // Tính toàn bộ số liệu thu/chi của 1 tháng. Đọc dữ liệu KHÔNG tạo node mới (khác getAtt/getComm)
+  // để xem báo cáo quý/năm không sinh rác dữ liệu rỗng cho các tháng chưa có chấm công.
+  function computeFinanceMonth(m){
+    const monthContracts = customerContracts.filter(c => (c.signDate||'').slice(0,7) === m);
+    const contractRevenue = monthContracts.reduce((s,c)=> s + (c.revenue||0), 0);
+
+    let salaryCost = 0, bonusCost = 0, marketingCost = 0;
+    const ATT_EMPTY = {actualDays:0, leavePaid:0, leaveUnpaid:0, lateT1:0, lateT2:0, lateT3:0, earlyT1:0, earlyT2:0, earlyT3:0, otWeekday:0, otWeekend:0, otHoliday:0, bonus:0, otherDeduction:0};
+    employees.forEach(emp=>{
+      if(!finEmpActiveInMonth(emp, m)) return;
+      const att = (attendanceByMonth[m] && attendanceByMonth[m][emp.id]) || ATT_EMPTY;
+      const comm = (commissionByMonth[m] && commissionByMonth[m][emp.id]) || {revenue:0, marketingCost:0};
+      const p = computePayroll(emp, att, comm);
+      // Chi lương = tổng chi phí công ty (gross + BHXH DN đóng) TRỪ phần thưởng & hoa hồng (tách riêng dòng dưới)
+      salaryCost += p.totalCompanyCost - p.bonus - p.commissionAmount;
+      bonusCost += p.bonus + p.commissionAmount;
+      if(emp.position === 'marketing' || (emp.position === 'lead' && (emp.leadDept||'sales') === 'marketing')){
+        marketingCost += comm.marketingCost || 0;
+      }
+    });
+
+    const entries = finEntriesOfMonth(m);
+    const otherIncome = entries.filter(e=>e.type==='thu').reduce((s,e)=> s + (e.amount||0), 0);
+    const otherExpense = entries.filter(e=>e.type==='chi').reduce((s,e)=> s + (e.amount||0), 0);
+    const totalIncome = contractRevenue + otherIncome;
+    const totalExpense = salaryCost + bonusCost + marketingCost + otherExpense;
+    return {
+      month: m, contractCount: monthContracts.length,
+      contractRevenue, otherIncome, salaryCost, bonusCost, marketingCost, otherExpense,
+      totalIncome, totalExpense, profit: totalIncome - totalExpense, entries
+    };
+  }
+  // Cộng dồn số liệu tài chính của nhiều tháng (dùng cho Dashboard xem theo quý/năm).
+  function computeFinanceForMonths(months){
+    const sum = {contractCount:0, contractRevenue:0, otherIncome:0, salaryCost:0, bonusCost:0, marketingCost:0, otherExpense:0, totalIncome:0, totalExpense:0, profit:0};
+    (months||[]).forEach(m=>{
+      const f = computeFinanceMonth(m);
+      for(const k in sum){ sum[k] += f[k] || 0; }
+    });
+    return sum;
+  }
+
+  function renderFinance(){
+    const sumEl = document.getElementById('fin-summary');
+    if(!sumEl) return;
+    updateMonthLabels();
+    const m = currentMonth();
+    const f = computeFinanceMonth(m);
+
+    const profitColor = f.profit >= 0 ? 'var(--teal)' : 'var(--red)';
+    const marginPct = f.totalIncome > 0 ? (f.profit / f.totalIncome * 100) : 0;
+    sumEl.innerHTML = `
+      <div class="sum-card"><div class="lbl">Tổng thu</div><div class="val">${fmt(f.totalIncome)}đ</div></div>
+      <div class="sum-card"><div class="lbl">Tổng chi</div><div class="val">${fmt(f.totalExpense)}đ</div></div>
+      <div class="sum-card"><div class="lbl">${f.profit >= 0 ? 'Lợi nhuận' : 'Lỗ'}</div><div class="val" style="color:${profitColor};">${fmt(f.profit)}đ</div></div>
+      <div class="sum-card"><div class="lbl">Tỉ suất lợi nhuận / thu</div><div class="val" style="color:${profitColor};">${f.totalIncome>0 ? marginPct.toFixed(1)+'%' : '—'}</div></div>
+    `;
+
+    const incomeTbody = document.getElementById('fin-income-tbody');
+    incomeTbody.innerHTML = `
+      <tr><td>Doanh thu hợp đồng (${fmt(f.contractCount)} hợp đồng ký trong tháng)</td><td class="num mono-cell" style="color:var(--teal);font-weight:650;">${fmt(f.contractRevenue)}</td></tr>
+      <tr><td>Khoản thu khác (ngoài CRM)</td><td class="num mono-cell" style="color:var(--teal);">${fmt(f.otherIncome)}</td></tr>
+      <tr><td style="font-weight:700;">Tổng thu</td><td class="num mono-cell" style="font-weight:700;color:var(--teal);">${fmt(f.totalIncome)}</td></tr>
+    `;
+
+    const expenseTbody = document.getElementById('fin-expense-tbody');
+    expenseTbody.innerHTML = `
+      <tr><td>Lương (theo Bảng lương, gồm phụ cấp, tăng ca &amp; BHXH DN đóng)</td><td class="num mono-cell" style="color:var(--red);">${fmt(f.salaryCost)}</td></tr>
+      <tr><td>Thưởng &amp; hoa hồng</td><td class="num mono-cell" style="color:var(--red);">${fmt(f.bonusCost)}</td></tr>
+      <tr><td>Chi phí marketing</td><td class="num mono-cell" style="color:var(--red);">${fmt(f.marketingCost)}</td></tr>
+      <tr><td>Khoản chi khác (ngoài CRM)</td><td class="num mono-cell" style="color:var(--red);">${fmt(f.otherExpense)}</td></tr>
+      <tr><td style="font-weight:700;">Tổng chi</td><td class="num mono-cell" style="font-weight:700;color:var(--red);">${fmt(f.totalExpense)}</td></tr>
+    `;
+
+    // Bảng khoản thu/chi lẻ ngoài CRM
+    const manualTbody = document.getElementById('fin-manual-tbody');
+    const manualEmpty = document.getElementById('fin-manual-empty');
+    manualEmpty.style.display = f.entries.length ? 'none' : 'block';
+    manualTbody.innerHTML = f.entries.map(e=>`
+      <tr>
+        <td class="mono-cell" style="white-space:nowrap;">${escapeHtml(e.date||'—')}</td>
+        <td><span class="pill ${e.type==='thu' ? 'teal' : 'red'}">${e.type==='thu' ? 'Thu' : 'Chi'}</span></td>
+        <td style="font-weight:600;">${escapeHtml(e.name||'')}</td>
+        <td class="num mono-cell" style="font-weight:650;color:${e.type==='thu' ? 'var(--teal)' : 'var(--red)'};">${e.type==='thu' ? '+' : '-'}${fmt(e.amount)}</td>
+        <td style="color:var(--ink-soft);">${escapeHtml(e.note||'')}</td>
+        <td style="text-align:right;"><button class="btn danger-ghost sm" data-fin-del="${e.id}">Xoá</button></td>
+      </tr>
+    `).join('');
+    $$('[data-fin-del]', manualTbody).forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        if(!await showConfirmDialog('Xoá khoản thu/chi này?')) return;
+        await deleteFinEntry(m, btn.getAttribute('data-fin-del'));
+        renderFinance();
+        renderReport();
+        toast('Đã xoá khoản thu/chi');
+      });
+    });
+
+    // Ngày mặc định của form: hôm nay nếu đang xem đúng tháng hiện tại, ngược lại ngày 01 của tháng đang xem
+    const feDate = document.getElementById('fe-date');
+    if(feDate && !feDate.value){
+      const todayISO = new Date().toISOString().slice(0,10);
+      feDate.value = todayISO.slice(0,7) === m ? todayISO : (m + '-01');
+    }
+  }
+
+  // Bảng báo cáo tài chính trên Dashboard — tính theo KỲ đang xem (tháng/quý/năm), chỉ hiện với Giám đốc.
+  function renderFinanceDashboard(){
+    const card = document.getElementById('report-finance-card');
+    if(!card) return;
+    const role = currentUser ? currentUser.role : null;
+    if(role !== 'giamdoc'){ card.style.display = 'none'; return; }
+    card.style.display = '';
+    const f = computeFinanceForMonths(rptPeriodMonths());
+    const pctOf = (v, total) => total > 0 ? (v/total*100).toFixed(0)+'%' : '—';
+    const profitColor = f.profit >= 0 ? 'var(--teal)' : 'var(--red)';
+    document.getElementById('report-finance-tbody').innerHTML = `
+      <tr><td style="font-weight:700;">💰 TỔNG THU</td><td class="num mono-cell" style="font-weight:700;color:var(--teal);">${fmt(f.totalIncome)}</td><td class="num">100%</td></tr>
+      <tr><td style="padding-left:22px;">Doanh thu hợp đồng (${fmt(f.contractCount)} hợp đồng)</td><td class="num mono-cell">${fmt(f.contractRevenue)}</td><td class="num">${pctOf(f.contractRevenue, f.totalIncome)}</td></tr>
+      <tr><td style="padding-left:22px;">Khoản thu khác (ngoài CRM)</td><td class="num mono-cell">${fmt(f.otherIncome)}</td><td class="num">${pctOf(f.otherIncome, f.totalIncome)}</td></tr>
+      <tr><td style="font-weight:700;">💸 TỔNG CHI</td><td class="num mono-cell" style="font-weight:700;color:var(--red);">${fmt(f.totalExpense)}</td><td class="num">100%</td></tr>
+      <tr><td style="padding-left:22px;">Lương (gồm BHXH DN đóng)</td><td class="num mono-cell">${fmt(f.salaryCost)}</td><td class="num">${pctOf(f.salaryCost, f.totalExpense)}</td></tr>
+      <tr><td style="padding-left:22px;">Thưởng &amp; hoa hồng</td><td class="num mono-cell">${fmt(f.bonusCost)}</td><td class="num">${pctOf(f.bonusCost, f.totalExpense)}</td></tr>
+      <tr><td style="padding-left:22px;">Chi phí marketing</td><td class="num mono-cell">${fmt(f.marketingCost)}</td><td class="num">${pctOf(f.marketingCost, f.totalExpense)}</td></tr>
+      <tr><td style="padding-left:22px;">Khoản chi khác (ngoài CRM)</td><td class="num mono-cell">${fmt(f.otherExpense)}</td><td class="num">${pctOf(f.otherExpense, f.totalExpense)}</td></tr>
+      <tr><td style="font-weight:800;">${f.profit >= 0 ? '📈 LỢI NHUẬN' : '📉 LỖ'}</td><td class="num mono-cell" style="font-weight:800;color:${profitColor};">${fmt(f.profit)}</td><td class="num" style="color:${profitColor};font-weight:700;">${f.totalIncome>0 ? (f.profit/f.totalIncome*100).toFixed(1)+'%' : '—'}</td></tr>
+    `;
+    document.getElementById('report-finance-note').textContent =
+      `Kỳ ${rptPeriodLabel()} — Thu lấy từ doanh thu hợp đồng theo ngày ký; Chi lấy từ bảng lương (lương, thưởng, hoa hồng), chi phí marketing và các khoản nhập tay ở tab "Báo cáo tài chính".`;
+  }
+
+  document.getElementById('btn-add-fin-entry').addEventListener('click', async ()=>{
+    const name = $('#fe-name').value.trim();
+    const amount = moneyNum($('#fe-amount').value);
+    if(!name || !amount){ toast('Vui lòng nhập tên khoản và số tiền'); return; }
+    const type = $('#fe-type').value === 'thu' ? 'thu' : 'chi';
+    const date = $('#fe-date').value || (currentMonth() + '-01');
+    const month = date.slice(0,7); // khoản thuộc về tháng của NGÀY đã chọn (có thể khác tháng đang xem)
+    const id = 'fe' + Date.now() + Math.floor(Math.random()*1000);
+    const entry = { type, name, amount, date, note: $('#fe-note').value.trim(), time: Date.now() };
+    if(!financeByMonth[month]) financeByMonth[month] = {};
+    financeByMonth[month][id] = entry;
+    await patchFinEntry(month, id, entry);
+    $('#fe-name').value=''; $('#fe-amount').value=''; $('#fe-note').value='';
+    toast(month !== currentMonth()
+      ? `Đã thêm khoản ${type==='thu'?'thu':'chi'} vào tháng ${month} (khác tháng đang xem)`
+      : `Đã thêm khoản ${type==='thu'?'thu':'chi'}`);
+    renderFinance();
+    renderReport();
+  });
+
   function renderAll(){
     renderEmployees();
     renderAttendance();
@@ -11488,6 +11812,7 @@ Bằng việc thực hiện xác nhận điện tử bên dưới, Bên B xác n
     renderCskhCalls();
     renderReport();
     renderPayroll();
+    renderFinance();
   }
 
   // ---------- events ----------
@@ -11727,6 +12052,7 @@ Bằng việc thực hiện xác nhận điện tử bên dưới, Bên B xác n
       leadDept: position === 'lead' ? ($('#f-lead-dept').value || 'sales') : null,
       leadEmployeeIds: position === 'lead' ? $$('#f-lead-emp-list input[type="checkbox"]:checked').map(cb=>cb.value) : [],
       empType: $('#f-emp-type').value || 'chinhthuc',
+      salaryMode: $('#f-salary-mode').value || 'kpi',
       startDate: $('#f-start-date').value || '',
       endDate: $('#f-end-date').value || '',
       contractFile: pendingContractFile || null
@@ -12553,6 +12879,10 @@ Bằng việc thực hiện xác nhận điện tử bên dưới, Bên B xác n
       </div>`).join('');
 
     document.getElementById('rate-sales-perf').value = fmt(c.salesPerfBonus);
+    document.getElementById('rate-sales-kpi-base').value = fmt(c.salesKpiBase ?? DEFAULT_COMMISSION.salesKpiBase);
+    document.getElementById('rate-sales-kpi-mid-th').value = c.salesKpiMidThreshold ?? DEFAULT_COMMISSION.salesKpiMidThreshold;
+    document.getElementById('rate-sales-kpi-mid-factor').value = c.salesKpiMidFactor ?? DEFAULT_COMMISSION.salesKpiMidFactor;
+    document.getElementById('rate-sales-kpi-low-factor').value = c.salesKpiLowFactor ?? DEFAULT_COMMISSION.salesKpiLowFactor;
     document.getElementById('rate-hcns-t1').value = fmt(c.hcnsRates.t1);
     document.getElementById('rate-hcns-t2').value = fmt(c.hcnsRates.t2);
     document.getElementById('rate-hcns-t3').value = fmt(c.hcnsRates.t3);
@@ -12719,7 +13049,11 @@ Bằng việc thực hiện xác nhận điện tử bên dưới, Bên B xác n
       cskhBonus: moneyNum($('#rate-cskh-bonus').value),
       marketingTiers,
       leadMarketingTiers,
-      salesPerfBonus: moneyNum($('#rate-sales-perf').value)
+      salesPerfBonus: moneyNum($('#rate-sales-perf').value),
+      salesKpiBase: moneyNum($('#rate-sales-kpi-base').value) || DEFAULT_COMMISSION.salesKpiBase,
+      salesKpiMidThreshold: numOr0($('#rate-sales-kpi-mid-th').value) || DEFAULT_COMMISSION.salesKpiMidThreshold,
+      salesKpiMidFactor: numOr0($('#rate-sales-kpi-mid-factor').value) || DEFAULT_COMMISSION.salesKpiMidFactor,
+      salesKpiLowFactor: numOr0($('#rate-sales-kpi-low-factor').value) || DEFAULT_COMMISSION.salesKpiLowFactor
     };
     await saveSettings();
     renderRateEditors();
@@ -12959,13 +13293,13 @@ Bằng việc thực hiện xác nhận điện tử bên dưới, Bên B xác n
   // ---------- role permissions ----------
   function applyRolePermissions(){
     const role = currentUser ? currentUser.role : null;
-    const allTabs = ['emp','att','com','plan','contracts','cdraft','leads','tasks','cskh','report','pay','set'];
+    const allTabs = ['emp','att','com','plan','contracts','cdraft','leads','tasks','cskh','report','pay','fin','set'];
     let visibleTabs = allTabs;
     if(role === 'quanly') visibleTabs = ['att','tasks'];
     else if(role === 'nhanvien') visibleTabs = ['att','com','plan','contracts','cdraft','leads','tasks','pay'];
     else if(role === 'lead') visibleTabs = ['att','com','plan','contracts','cdraft','leads','tasks','report'];
     else if(role === 'hcns') visibleTabs = ['att','com','tasks','pay'];
-    else if(role === 'ketoan') visibleTabs = ['contracts','tasks','pay'];
+    else if(role === 'ketoan') visibleTabs = ['contracts','tasks','pay','fin'];
     else if(role === 'cskh') visibleTabs = ['contracts','cskh','com','tasks','pay'];
 
     allTabs.forEach(t=>{
@@ -13509,8 +13843,9 @@ Bằng việc thực hiện xác nhận điện tử bên dưới, Bên B xác n
     contracts: ['customer-contracts','employees'],
     leads: ['customer-leads','employees'],
     cskh: ['cskh-calls','employees','customer-contracts'],
-    report: ['employees','customer-leads','customer-contracts','commission-by-month','daily-by-month','cskh-calls','weekly-plan-by-month','settings'],
+    report: ['employees','customer-leads','customer-contracts','commission-by-month','daily-by-month','cskh-calls','weekly-plan-by-month','settings','attendance-by-month','finance-by-month'],
     pay: ['employees','attendance-by-month','commission-by-month','settings','daily-by-month'],
+    fin: ['employees','attendance-by-month','commission-by-month','customer-contracts','settings','finance-by-month'],
     set: ['settings','employees'],
     tasks: ['tasks','employees'],
     cdraft: ['contract-drafts','employees','customer-contracts']
