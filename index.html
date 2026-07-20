@@ -10183,12 +10183,26 @@ window.storage = {
     const info = computeCommission(emp, c);
     return (emp.leadDept || "sales") === "marketing" ? info.avgPct || 0 : info.pct || 0;
   }
+  function rptVisibleContractsAll() {
+    if (currentUser && currentUser.role === "lead") {
+      const ids = leadEmployeeIds();
+      return customerContracts.filter(c => ids.includes(c.empId));
+    }
+    if (currentUser && currentUser.role === "nhanvien") {
+      return customerContracts.filter(c => c.empId === currentUser.employee_id);
+    }
+    return customerContracts;
+  }
+  function rptVisibleContractsInPeriod() {
+    return rptVisibleContractsAll().filter(c => rptInPeriod(c.signDate));
+  }
   function salesMergedTotals() {
     const salesEmps = planVisibleEmployees("sales");
     const leadSalesEmps = planVisibleLeadEmployees("sales");
     const target = rptSumOverPeriod(() => salesEmps.reduce((s, e) => s + empWeeklySumTarget(e), 0) + leadSalesEmps.reduce((s, e) => s + leadOwnTarget(e), 0));
-    const actual = rptSumOverPeriod(() => salesEmps.reduce((s, e) => s + (getComm(e.id).revenue || 0), 0) + leadSalesEmps.reduce((s, e) => s + leadOwnRevenue(e), 0));
-    const contracts = rptSumOverPeriod(() => salesEmps.reduce((s, e) => s + (getComm(e.id).contractsActual || 0), 0) + leadSalesEmps.reduce((s, e) => s + (getComm(e.id).contractsActual || 0), 0));
+    const periodContracts = rptVisibleContractsInPeriod();
+    const actual = periodContracts.reduce((s, c) => s + (c.revenue || 0), 0);
+    const contracts = periodContracts.length;
     const contractTarget = rptSumOverPeriod(() => salesEmps.reduce((s, e) => s + (getComm(e.id).contractTarget || 0), 0) + leadSalesEmps.reduce((s, e) => s + (getComm(e.id).contractTarget || 0), 0));
     const potential = rptSumOverPeriod(() => salesEmps.reduce((s, e) => s + (getComm(e.id).potentialActual || 0), 0));
     const headcount = salesEmps.length + leadSalesEmps.length;
@@ -10229,17 +10243,13 @@ window.storage = {
     if (!gaugeEl || !statsEl) return;
     const t = salesMergedTotals();
     const hasTarget = t.target > 0;
-    const trendEmps = [ ...planVisibleEmployees("sales"), ...planVisibleLeadEmployees("sales") ];
     const dateKeys = rptDateKeysInRange();
-    const dailyVals = dateKeys.map(dateKey => {
-      let sum = 0;
-      trendEmps.forEach(e => {
-        const day = getEmpDaily(e.id, dateKey.slice(0, 7));
-        const entry = day[dateKey];
-        if (entry) sum += entry.revenue || 0;
-      });
-      return sum;
+    const revByDate = {};
+    rptVisibleContractsAll().forEach(c => {
+      const k = (c.signDate || "").slice(0, 10);
+      revByDate[k] = (revByDate[k] || 0) + (c.revenue || 0);
     });
+    const dailyVals = dateKeys.map(dateKey => revByDate[dateKey] || 0);
     gaugeEl.innerHTML = svgAreaChart([ {
       label: "Doanh thu/ngày",
       values: dailyVals,
@@ -10398,18 +10408,13 @@ window.storage = {
     const rCurKeys = rptElapsedDateKeys(rptPeriodMonths());
     const rPrevKeys = rptAllDateKeysOfMonths(rptPrevPeriodMonths()).slice(0, rCurKeys.length);
     function rptSalesTotalsForKeys(keys) {
-      const periodEmps = [ ...planVisibleEmployees("sales"), ...planVisibleLeadEmployees("sales") ];
+      const keySet = new Set(keys);
       let revenue = 0, contracts = 0;
-      keys.forEach(dateKey => {
-        const mKey = dateKey.slice(0, 7);
-        periodEmps.forEach(e => {
-          const day = getEmpDaily(e.id, mKey);
-          const entry = day[dateKey];
-          if (entry) {
-            revenue += entry.revenue || 0;
-            contracts += entry.contracts || 0;
-          }
-        });
+      rptVisibleContractsAll().forEach(c => {
+        if (keySet.has((c.signDate || "").slice(0, 10))) {
+          revenue += c.revenue || 0;
+          contracts += 1;
+        }
       });
       return {
         revenue: revenue,
