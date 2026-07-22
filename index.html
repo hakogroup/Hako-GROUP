@@ -7786,7 +7786,7 @@ window.storage = {
     thatbai: "Thất Bại"
   };
   const FOLLOWUP_WARN_STATUSES = [ "ketnoi", "demo", "chuaketnoi", "chuyenhang" ];
-  const FOLLOWUP_WARN_MS = 2 * 24 * 60 * 60 * 1e3;
+  const FOLLOWUP_WARN_MS = 3 * 24 * 60 * 60 * 1e3;
   function leadLastCareTime(l) {
     let last = 0;
     if (l.date) {
@@ -7887,7 +7887,7 @@ window.storage = {
       };
     }).filter(({emp: emp}) => emp && (emp.position === "sales" || emp.position === "lead" && (emp.leadDept || "sales") === "sales")).map(({l: l, emp: emp}) => {
       const last = leadLastCareTime(l);
-      const daysOverdue = Math.max(2, Math.floor((Date.now() - last) / (24 * 60 * 60 * 1e3)));
+      const daysOverdue = Math.max(3, Math.floor((Date.now() - last) / (24 * 60 * 60 * 1e3)));
       return {
         l: l,
         empName: emp.name,
@@ -9581,7 +9581,7 @@ window.storage = {
     list.forEach(l => {
       const editable = canEditLead(l);
       const tr = document.createElement("tr");
-      tr.innerHTML = `\n        <td>\n          <div style="font-weight:700;">${escapeHtml(l.name || "")}</div>\n          <div style="font-size:11px;color:var(--ink-soft);font-family:var(--mono);">${escapeHtml(l.phone || "")} · ${l.date || ""}</div>\n        </td>\n        <td>${escapeHtml(empNameById(l.empId))}</td>\n        <td>${editable ? `<button type="button" class="connect-pill ${l.connectStatus || "moi"}" data-status-btn="${l.id}" data-status-kind="connect">${CONNECT_LABEL[l.connectStatus || "moi"] || ""} <span class="status-pill-caret">▾</span></button>` : `<span class="connect-pill ${l.connectStatus || "moi"}">${CONNECT_LABEL[l.connectStatus || "moi"] || ""}</span>`}</td>\n        <td>${editable ? `<button type="button" class="work-pill ${l.workStatus || "chuaketnoi"}" data-status-btn="${l.id}" data-status-kind="work">${WORK_LABEL[l.workStatus] || ""} <span class="status-pill-caret">▾</span></button>` : `<span class="work-pill ${l.workStatus || "chuaketnoi"}">${WORK_LABEL[l.workStatus] || ""}</span>`}${leadNeedsFollowUp(l) ? `<span class="followup-warn-badge" title="Đã hơn 2 ngày chưa chăm sóc lại khách hàng này">⚠️</span>` : ""}</td>\n        <td style="white-space:nowrap;">\n          <button class="btn ghost sm" data-ld-detail="${l.id}">Chi tiết${(l.notes || []).length ? ` (${(l.notes || []).length})` : ""}</button>\n        </td>\n      `;
+      tr.innerHTML = `\n        <td>\n          <div style="font-weight:700;">${escapeHtml(l.name || "")}</div>\n          <div style="font-size:11px;color:var(--ink-soft);font-family:var(--mono);">${escapeHtml(l.phone || "")} · ${l.date || ""}</div>\n        </td>\n        <td>${escapeHtml(empNameById(l.empId))}</td>\n        <td>${editable ? `<button type="button" class="connect-pill ${l.connectStatus || "moi"}" data-status-btn="${l.id}" data-status-kind="connect">${CONNECT_LABEL[l.connectStatus || "moi"] || ""} <span class="status-pill-caret">▾</span></button>` : `<span class="connect-pill ${l.connectStatus || "moi"}">${CONNECT_LABEL[l.connectStatus || "moi"] || ""}</span>`}</td>\n        <td>${editable ? `<button type="button" class="work-pill ${l.workStatus || "chuaketnoi"}" data-status-btn="${l.id}" data-status-kind="work">${WORK_LABEL[l.workStatus] || ""} <span class="status-pill-caret">▾</span></button>` : `<span class="work-pill ${l.workStatus || "chuaketnoi"}">${WORK_LABEL[l.workStatus] || ""}</span>`}${leadNeedsFollowUp(l) ? `<span class="followup-warn-badge" title="Đã hơn 3 ngày chưa chăm sóc lại khách hàng này">!</span>` : ""}</td>\n        <td style="white-space:nowrap;">\n          <button class="btn ghost sm" data-ld-detail="${l.id}">Chi tiết${(l.notes || []).length ? ` (${(l.notes || []).length})` : ""}</button>\n        </td>\n      `;
       tbody.appendChild(tr);
     });
     $$("[data-ld-detail]", tbody).forEach(btn => {
