@@ -537,11 +537,11 @@
   .sign-header p{font-size:12.5px;color:var(--ink-soft);margin:0;}
   .sign-card{background:#fff;border-radius:16px;padding:24px 22px;box-shadow:0 8px 30px rgba(22,35,63,0.08);margin-bottom:16px;}
   .sign-contract-text{
-    white-space:pre-wrap;font-size:13.5px;line-height:1.85;color:var(--ink);word-break:break-word;
+    white-space:pre-wrap;font-size:15.5px;line-height:1.85;color:var(--ink);word-break:break-word;
     max-height:50vh;overflow-y:auto;padding-right:6px;border-bottom:1px solid var(--line);margin-bottom:18px;padding-bottom:18px;
   }
-  .sign-price-table{width:100%;border-collapse:collapse;white-space:normal;margin:14px 0 18px;font-size:13px;}
-  .sign-price-table th{background:#F3F2EC;text-align:left;padding:9px 10px;font-weight:800;font-size:12px;color:var(--ink-soft);border:1px solid var(--line);}
+  .sign-price-table{width:100%;border-collapse:collapse;white-space:normal;margin:14px 0 18px;font-size:15px;}
+  .sign-price-table th{background:#F3F2EC;text-align:left;padding:9px 10px;font-weight:800;font-size:14px;color:var(--ink-soft);border:1px solid var(--line);}
   .sign-price-table td{padding:9px 10px;border:1px solid var(--line);}
   .sign-price-table tfoot td{font-weight:800;background:#FAFAF5;}
   .sign-confirm-block{display:flex;gap:24px;margin:16px 0;white-space:normal;}
@@ -2121,6 +2121,7 @@
             <div class="cc-field"><label>Mã hợp đồng</label><input id="cd-code" placeholder="HD-0001"/></div>
             <div class="cc-field"><label>Tên khách hàng</label><input id="cd-customer-name" placeholder="Nguyễn Văn A" style="min-width:180px"/></div>
             <div class="cc-field"><label>Số điện thoại khách</label><input id="cd-customer-phone" placeholder="09xxxxxxxx" inputmode="numeric" maxlength="10"/></div>
+            <div class="cc-field"><label>CCCD</label><input id="cd-cccd" placeholder="Số căn cước công dân" inputmode="numeric" maxlength="12" style="min-width:160px"/></div>
             <div class="cc-field"><label>Tên quán / doanh nghiệp</label><input id="cd-shop" placeholder="Quán Cafe ABC" style="min-width:180px"/></div>
             <div class="cc-field"><label>Địa chỉ</label><input id="cd-address" placeholder="Số nhà, đường, quận..." style="min-width:220px"/></div>
             <div class="cc-field"><label>Mô hình</label>
@@ -3363,7 +3364,7 @@
       <div class="cc-card">
         <h2>📜 Nội dung hợp đồng</h2>
         <p class="sub" style="font-family:var(--mono);font-size:11px;line-height:1.8;background:#F8F7F2;padding:10px 12px;border-radius:8px;">
-          {{code}} · {{day}} · {{month}} · {{year}} · {{companyName}} · {{companyRep}} · {{companyRepTitle}} · {{companyAddress}} · {{companyPhone}} · {{companyEmail}} · {{customerName}} · {{customerPhone}} · {{shop}} · {{address}} · {{modelLabel}}
+          {{code}} · {{day}} · {{month}} · {{year}} · {{companyName}} · {{companyRep}} · {{companyRepTitle}} · {{companyAddress}} · {{companyPhone}} · {{companyEmail}} · {{customerName}} · {{customerPhone}} · {{customerCCCD}} · {{shop}} · {{address}} · {{modelLabel}}
         </p>
         <div class="cc-field" style="width:100%;margin-top:10px;">
           <label>Phần 1 — Trước bảng giá dịch vụ</label>
@@ -6960,7 +6961,7 @@ window.storage = {
     if (currentUser.role === "giamdoc" || currentUser.role === "hcns" || currentUser.role === "ketoan") return true;
     return canEditContract(c);
   }
-  const CONTRACT_TEMPLATE_PART1 = `<div style="text-align:center;"><b>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</b><br/><b>Độc lập - Tự do - Hạnh phúc</b><br/>—ooOoo—</div>\n\n<div style="text-align:center;margin-top:6px;"><b style="font-size:15px;">HỢP ĐỒNG CUNG CẤP VÀ SỬ DỤNG DỊCH VỤ PHẦN MỀM</b><br/>Số: {{code}}</div>\n\nCăn cứ Bộ luật Dân sự số 91/2015/QH13 ngày 24/11/2015;\nCăn cứ Luật Thương mại số 36/2005/QH11 ngày 14/06/2005;\nCăn cứ Luật Giao dịch điện tử số 20/2023/QH15 ngày 22/06/2023;\nCăn cứ vào nhu cầu và khả năng thực tế của hai bên.\n\nHôm nay, ngày {{day}} tháng {{month}} năm {{year}}, các Bên gồm có:\n\n<b>BÊN A: BÊN CUNG CẤP DỊCH VỤ</b>\nTên đơn vị: {{companyName}}\nĐại diện pháp luật: {{companyRep}} — Chức vụ: {{companyRepTitle}}\nĐịa chỉ: {{companyAddress}}\nHotline: {{companyPhone}} — Email: {{companyEmail}}\n\n<b>BÊN B: KHÁCH HÀNG SỬ DỤNG DỊCH VỤ</b>\nTên cửa hàng / Doanh nghiệp: {{shop}}\nNgười đại diện / Chủ hộ kinh doanh: {{customerName}}\nSố điện thoại: {{customerPhone}}\nĐịa chỉ lắp đặt / triển khai: {{address}}\nMô hình kinh doanh: {{modelLabel}}\n\n<b>ĐIỀU 1: NỘI DUNG DỊCH VỤ VÀ CHI PHÍ</b>\n\nBên A cấp quyền sử dụng phần mềm quản lý bán hàng và cung cấp các thiết bị phụ trợ (nếu có) cho Bên B theo danh mục chi tiết dưới đây:`;
+  const CONTRACT_TEMPLATE_PART1 = `<div style="text-align:center;"><b>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</b><br/><b>Độc lập - Tự do - Hạnh phúc</b><br/>—ooOoo—</div>\n\n<div style="text-align:center;margin-top:6px;"><b style="font-size:15px;">HỢP ĐỒNG CUNG CẤP VÀ SỬ DỤNG DỊCH VỤ PHẦN MỀM</b><br/>Số: {{code}}</div>\n\nCăn cứ Bộ luật Dân sự số 91/2015/QH13 ngày 24/11/2015;\nCăn cứ Luật Thương mại số 36/2005/QH11 ngày 14/06/2005;\nCăn cứ Luật Giao dịch điện tử số 20/2023/QH15 ngày 22/06/2023;\nCăn cứ vào nhu cầu và khả năng thực tế của hai bên.\n\nHôm nay, ngày {{day}} tháng {{month}} năm {{year}}, các Bên gồm có:\n\n<b>BÊN A: BÊN CUNG CẤP DỊCH VỤ</b>\nTên đơn vị: {{companyName}}\nĐại diện pháp luật: {{companyRep}} — Chức vụ: {{companyRepTitle}}\nĐịa chỉ: {{companyAddress}}\nHotline: {{companyPhone}} — Email: {{companyEmail}}\n\n<b>BÊN B: KHÁCH HÀNG SỬ DỤNG DỊCH VỤ</b>\nTên cửa hàng / Doanh nghiệp: {{shop}}\nNgười đại diện / Chủ hộ kinh doanh: {{customerName}}\nSố CCCD: {{customerCCCD}}\nSố điện thoại: {{customerPhone}}\nĐịa chỉ lắp đặt / triển khai: {{address}}\nMô hình kinh doanh: {{modelLabel}}\n\n<b>ĐIỀU 1: NỘI DUNG DỊCH VỤ VÀ CHI PHÍ</b>\n\nBên A cấp quyền sử dụng phần mềm quản lý bán hàng và cung cấp các thiết bị phụ trợ (nếu có) cho Bên B theo danh mục chi tiết dưới đây:`;
   const CONTRACT_TEMPLATE_PART2 = `Hình thức thanh toán: Chuyển khoản qua tài khoản ngân hàng chính thức của Bên A hoặc thu tiền mặt có phiếu thu hợp lệ.\n\n<b>ĐIỀU 2: THỜI HẠN TRIỂN KHAI VÀ BÀN GIAO</b>\n\n2.1. Khởi tạo tài khoản: Trong vòng 24 giờ kể từ khi nhận đủ thanh toán, Bên A có trách nhiệm khởi tạo hệ thống và bàn giao tài khoản quản trị (Admin) tối cao cho Bên B qua Số điện thoại/Email đã đăng ký.\n\n2.2. Hướng dẫn sử dụng: Bên A chịu trách nhiệm cài đặt phần mềm, kết nối thiết bị ngoại vi và hướng dẫn nhân sự của Bên B vận hành hệ thống thành thạo (trực tiếp hoặc qua UltraView/TeamViewer).\n\n<b>ĐIỀU 3: BẢO MẬT VÀ QUYỀN SỞ HỮU DỮ LIỆU</b>\n\n3.1. Quyền sở hữu dữ liệu: Toàn bộ thông tin về hàng hóa, doanh thu, khách hàng và dữ liệu kinh doanh do Bên B nhập lên hệ thống thuộc sở hữu tuyệt đối của Bên B.\n\n3.2. Trách nhiệm bảo mật: Bên A cam kết bảo mật tuyệt đối thông tin kinh doanh của Bên B; không sao lưu, tiết lộ hoặc cung cấp cho bất kỳ bên thứ ba nào khi chưa có sự đồng ý bằng văn bản của Bên B. Bên A có trách nhiệm duy trì hệ thống sao lưu (backup) định kỳ nhằm đảm bảo an toàn dữ liệu.\n\n<b>ĐIỀU 4: CHÍNH SÁCH HỖ TRỢ KỸ THUẬT VÀ BẢO HÀNH</b>\n\n4.1. Hỗ trợ kỹ thuật: Bên A cam kết duy trì tổng đài/kênh hỗ trợ trực tuyến để tiếp nhận và xử lý sự cố kỹ thuật phần mềm cho Bên B trong suốt thời hạn hợp đồng.\n\n4.2. Giới hạn trách nhiệm: Phần mềm hoạt động trên nền tảng điện toán đám mây. Bên A không chịu trách nhiệm đối với các gián đoạn dịch vụ xuất phát từ lỗi đường truyền Internet của Bên B hoặc các sự kiện bất khả kháng (sập mạng diện rộng, sự cố trung tâm dữ liệu quốc gia...). Mức bồi thường thiệt hại tối đa (nếu có phát sinh lỗi chủ quan từ phần mềm của Bên A) không vượt quá số tiền Bên B đã thanh toán cho thời gian bị ảnh hưởng.\n\n<b>ĐIỀU 5: ĐIỀU KHOẢN CHUNG VÀ HIỆU LỰC</b>\n\n5.1. Chính sách hoàn hủy: Hợp đồng phần mềm dạng dịch vụ (SaaS) không áp dụng chính sách hoàn trả chi phí khi Bên B chủ động ngưng sử dụng dịch vụ trước thời hạn.\n\n5.2. Hình thức ký kết: Hợp đồng này được thiết lập dưới dạng Hợp đồng điện tử. Bên B xác nhận bằng mã OTP, chữ ký số hoặc nhấn nút "Xác nhận đồng ý" trên hệ thống của Bên A.\n\n5.3. Hiệu lực: Hợp đồng có đầy đủ giá trị pháp lý kể từ thời điểm Bên B thực hiện xác nhận điện tử và Bên A nhận đủ tiền thanh toán.\n\n<div style="text-align:center;"><b>XÁC NHẬN CỦA CÁC BÊN</b></div>\n\nBằng việc thực hiện xác nhận điện tử bên dưới, Bên B xác nhận đã đọc, hiểu rõ, được tư vấn đầy đủ và hoàn toàn đồng ý với toàn bộ nội dung, điều khoản quy định tại Hợp đồng này.\n\n{{confirmBlock}}`;
   function numberToVietnameseWords(num) {
     num = Math.round(num || 0);
@@ -7029,7 +7030,7 @@ window.storage = {
       });
       return s;
     }
-    const fillCommon = text => normalizeTemplatePlaceholders(text).replaceAll("{{companyName}}", escapeHtml(companyName)).replaceAll("{{companyTax}}", escapeHtml(settings.companyTax || "—")).replaceAll("{{companyAddress}}", escapeHtml(settings.companyAddress || "—")).replaceAll("{{companyRep}}", escapeHtml(settings.companyRep || "—")).replaceAll("{{companyRepTitle}}", escapeHtml(companyRepTitle)).replaceAll("{{companyPhone}}", escapeHtml(settings.companyPhone || "—")).replaceAll("{{companyEmail}}", escapeHtml(settings.companyEmail || "—")).replaceAll("{{confirmBlock}}", confirmBlockHtml).replaceAll("{{companySignature}}", settings.companySignatureImage ? `<br/><img src="${settings.companySignatureImage}" alt="Chữ ký đại diện" style="max-width:180px;max-height:80px;display:block;margin-top:4px;"/>` : " (Đã ký số hệ thống)").replaceAll("{{code}}", escapeHtml(d.code || "—")).replaceAll("{{day}}", String(dt.getDate()).padStart(2, "0")).replaceAll("{{month}}", String(dt.getMonth() + 1).padStart(2, "0")).replaceAll("{{year}}", String(dt.getFullYear())).replaceAll("{{customerName}}", escapeHtml(d.customerName || "—")).replaceAll("{{customerPhone}}", escapeHtml(d.customerPhone || "—")).replaceAll("{{shop}}", escapeHtml(d.shop || "—")).replaceAll("{{address}}", escapeHtml(d.address || "—")).replaceAll("{{modelLabel}}", escapeHtml(DRAFT_MODEL_LABEL[d.model] || d.model || "—"));
+    const fillCommon = text => normalizeTemplatePlaceholders(text).replaceAll("{{companyName}}", escapeHtml(companyName)).replaceAll("{{companyTax}}", escapeHtml(settings.companyTax || "—")).replaceAll("{{companyAddress}}", escapeHtml(settings.companyAddress || "—")).replaceAll("{{companyRep}}", escapeHtml(settings.companyRep || "—")).replaceAll("{{companyRepTitle}}", escapeHtml(companyRepTitle)).replaceAll("{{companyPhone}}", escapeHtml(settings.companyPhone || "—")).replaceAll("{{companyEmail}}", escapeHtml(settings.companyEmail || "—")).replaceAll("{{confirmBlock}}", confirmBlockHtml).replaceAll("{{companySignature}}", settings.companySignatureImage ? `<br/><img src="${settings.companySignatureImage}" alt="Chữ ký đại diện" style="max-width:180px;max-height:80px;display:block;margin-top:4px;"/>` : " (Đã ký số hệ thống)").replaceAll("{{code}}", escapeHtml(d.code || "—")).replaceAll("{{day}}", String(dt.getDate()).padStart(2, "0")).replaceAll("{{month}}", String(dt.getMonth() + 1).padStart(2, "0")).replaceAll("{{year}}", String(dt.getFullYear())).replaceAll("{{customerName}}", escapeHtml(d.customerName || "—")).replaceAll("{{customerPhone}}", escapeHtml(d.customerPhone || "—")).replaceAll("{{customerCCCD}}", escapeHtml(d.cccd || "—")).replaceAll("{{shop}}", escapeHtml(d.shop || "—")).replaceAll("{{address}}", escapeHtml(d.address || "—")).replaceAll("{{modelLabel}}", escapeHtml(DRAFT_MODEL_LABEL[d.model] || d.model || "—"));
     function cleanupSignatureRemnants(html) {
       if (!html) return html;
       if (html.indexOf("ĐẠI DIỆN BÊN") === -1 && html.indexOf("Xác nhận điện tử") === -1 && html.indexOf("XÁC NHẬN ĐIỆN TỬ") === -1) return html;
@@ -7168,7 +7169,7 @@ window.storage = {
     });
   }
   function resetDraftForm() {
-    [ "cd-code", "cd-customer-name", "cd-customer-phone", "cd-shop", "cd-address", "cd-package", "cd-revenue", "cd-emp", "cd-emp-search", "cd-mktemp", "cd-mktemp-search" ].forEach(id => {
+    [ "cd-code", "cd-customer-name", "cd-customer-phone", "cd-cccd", "cd-shop", "cd-address", "cd-package", "cd-revenue", "cd-emp", "cd-emp-search", "cd-mktemp", "cd-mktemp-search" ].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = "";
     });
@@ -8323,7 +8324,7 @@ window.storage = {
     const list = document.getElementById("notif-list");
     if (!list) return;
     const mine = myNotifications();
-    list.innerHTML = mine.length ? mine.map(n => `\n      <div class="notif-item ${n.read ? "" : "unread"}" data-notif-id="${n.id}" data-notif-lead="${n.leadId || ""}" data-notif-task="${n.taskId || ""}">\n        <div class="ni-title">${n.read ? "" : '<span class="ni-dot"></span>'}${escapeHtml(n.title || "Thông báo")}</div>\n        <div class="ni-msg">${escapeHtml(n.message || "")}</div>\n        <div class="ni-time">${timeAgoLabel(n.createdAt || Date.now())}</div>\n      </div>`).join("") : '<div class="notif-empty">Chưa có thông báo nào.</div>';
+    list.innerHTML = mine.length ? mine.map(n => `\n      <div class="notif-item ${n.read ? "" : "unread"}" data-notif-id="${n.id}" data-notif-lead="${n.leadId || ""}" data-notif-task="${n.taskId || ""}" data-notif-contract="${n.contractId || ""}">\n        <div class="ni-title">${n.read ? "" : '<span class="ni-dot"></span>'}${escapeHtml(n.title || "Thông báo")}</div>\n        <div class="ni-msg">${escapeHtml(n.message || "")}</div>\n        <div class="ni-time">${timeAgoLabel(n.createdAt || Date.now())}</div>\n      </div>`).join("") : '<div class="notif-empty">Chưa có thông báo nào.</div>';
     $$("[data-notif-id]", list).forEach(item => {
       item.addEventListener("click", async () => {
         const id = item.getAttribute("data-notif-id");
@@ -8337,6 +8338,7 @@ window.storage = {
         }
         const leadId = item.getAttribute("data-notif-lead");
         const taskId = item.getAttribute("data-notif-task");
+        const contractId = item.getAttribute("data-notif-contract");
         if (leadId && customerLeads.some(l => l.id === leadId)) {
           document.getElementById("notif-panel").classList.remove("show");
           document.querySelector('.cc-tab[data-tab="leads"]')?.click();
@@ -8353,6 +8355,26 @@ window.storage = {
           setTimeout(() => {
             openTaskDetail(taskId);
           }, 60);
+        } else if (contractId && customerContracts.some(c => c.id === contractId)) {
+          document.getElementById("notif-panel").classList.remove("show");
+          document.querySelector('.cc-tab[data-tab="contracts"]')?.click();
+          const ctFound = customerContracts.find(c => c.id === contractId);
+          ctFilterEmp = "";
+          ctFilterFrom = "";
+          ctFilterTo = "";
+          const fe = document.getElementById("ct-filter-emp");
+          if (fe) fe.value = "";
+          const fes = document.getElementById("ct-filter-emp-search");
+          if (fes) fes.value = "";
+          const ff = document.getElementById("ct-filter-from");
+          if (ff) ff.value = "";
+          const ft = document.getElementById("ct-filter-to");
+          if (ft) ft.value = "";
+          contractSearchTerm = ctFound && ctFound.code ? ctFound.code : "";
+          ctPage = 1;
+          const csi = document.getElementById("ct-search");
+          if (csi) csi.value = contractSearchTerm;
+          renderContracts();
         }
       });
     });
@@ -13505,7 +13527,7 @@ window.storage = {
       toast("Trình duyệt đã chặn cửa sổ in — vui lòng cho phép popup rồi thử lại.");
       return;
     }
-    w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Hợp đồng</title>\n      <style>\n        /* Bản in GỌN: lề hẹp + chữ 12px + giãn dòng 1.45 để hợp đồng nằm gọn trong ~2 trang A4\n           mà vẫn giữ dáng văn bản hành chính (Times New Roman, canh đều 2 lề). */\n        @page{ size:A4; margin:12mm 15mm; }\n        *{box-sizing:border-box;}\n        html,body{margin:0;padding:0;}\n        body{\n          font-family:'Times New Roman',Times,serif;\n          font-size:12px;line-height:1.45;color:#000;background:#fff;padding:0;\n        }\n        .pdf-wrap{width:100%;margin:0 auto;}\n        .pdf-contract-text{white-space:pre-wrap;word-break:break-word;text-align:justify;}\n        .pdf-contract-text > div{text-align:inherit;}\n        b[style*="font-size"]{font-size:13.5px !important;}\n        table{width:100%;border-collapse:collapse;white-space:normal;margin:8px 0;}\n        th,td{border:1px solid #444;padding:4px 7px;text-align:left;font-size:11.5px;line-height:1.35;}\n        /* Bảng giá trị hợp đồng (.sign-price-table) — khớp với khung xem trước, nén gọn */\n        .sign-price-table th{background:#F1F1F1;font-weight:700;font-size:11px;color:#000;}\n        .sign-price-table tfoot td{font-weight:700;background:#F7F7F7;}\n        /* Khối "ĐẠI DIỆN BÊN A / BÊN B" — 2 cột song song, giống bản xem trước */\n        .sign-confirm-block{display:flex;gap:20px;margin:12px 0 2px;white-space:normal;}\n        .sign-confirm-col{flex:1;text-align:center;}\n        .sign-confirm-col .scc-label{font-weight:700;font-size:12px;margin-bottom:5px;}\n        .sign-confirm-col .scc-sub{font-size:10.5px;color:#333;margin-bottom:6px;}\n        .sign-confirm-col img{max-width:140px;max-height:60px;}\n        .pdf-signed-info{\n          font-size:10.5px;color:#333;text-align:center;margin-top:12px;padding-top:6px;\n          border-top:1px solid #ccc;\n        }\n        @media print{\n          tr{ break-inside:avoid; }\n          .sign-confirm-block{ break-inside:avoid; }\n          .pdf-signed-info{ break-inside:avoid; }\n          p, div{ orphans:3; widows:3; }\n        }\n      </style></head><body>\n        <div class="pdf-wrap">\n          <div class="pdf-contract-text">${contentHtml}</div>\n          ${signedInfoHtml ? `<div class="pdf-signed-info">${signedInfoHtml}</div>` : ""}\n        </div>\n      </body></html>`);
+    w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Hợp đồng</title>\n      <style>\n        /* Bản in GỌN: lề hẹp + chữ 12px + giãn dòng 1.45 để hợp đồng nằm gọn trong ~2 trang A4\n           mà vẫn giữ dáng văn bản hành chính (Times New Roman, canh đều 2 lề). */\n        @page{ size:A4; margin:12mm 15mm; }\n        *{box-sizing:border-box;}\n        html,body{margin:0;padding:0;}\n        body{\n          font-family:'Times New Roman',Times,serif;\n          font-size:14px;line-height:1.45;color:#000;background:#fff;padding:0;\n        }\n        .pdf-wrap{width:100%;margin:0 auto;}\n        .pdf-contract-text{white-space:pre-wrap;word-break:break-word;text-align:justify;}\n        .pdf-contract-text > div{text-align:inherit;}\n        b[style*="font-size"]{font-size:15.5px !important;}\n        table{width:100%;border-collapse:collapse;white-space:normal;margin:8px 0;}\n        th,td{border:1px solid #444;padding:4px 7px;text-align:left;font-size:13.5px;line-height:1.35;}\n        /* Bảng giá trị hợp đồng (.sign-price-table) — khớp với khung xem trước, nén gọn */\n        .sign-price-table th{background:#F1F1F1;font-weight:700;font-size:13px;color:#000;}\n        .sign-price-table tfoot td{font-weight:700;background:#F7F7F7;}\n        /* Khối "ĐẠI DIỆN BÊN A / BÊN B" — 2 cột song song, giống bản xem trước */\n        .sign-confirm-block{display:flex;gap:20px;margin:12px 0 2px;white-space:normal;}\n        .sign-confirm-col{flex:1;text-align:center;}\n        .sign-confirm-col .scc-label{font-weight:700;font-size:14px;margin-bottom:5px;}\n        .sign-confirm-col .scc-sub{font-size:12.5px;color:#333;margin-bottom:6px;}\n        .sign-confirm-col img{max-width:140px;max-height:60px;}\n        .pdf-signed-info{\n          font-size:10.5px;color:#333;text-align:center;margin-top:12px;padding-top:6px;\n          border-top:1px solid #ccc;\n        }\n        @media print{\n          tr{ break-inside:avoid; }\n          .sign-confirm-block{ break-inside:avoid; }\n          .pdf-signed-info{ break-inside:avoid; }\n          p, div{ orphans:3; widows:3; }\n        }\n      </style></head><body>\n        <div class="pdf-wrap">\n          <div class="pdf-contract-text">${contentHtml}</div>\n          ${signedInfoHtml ? `<div class="pdf-signed-info">${signedInfoHtml}</div>` : ""}\n        </div>\n      </body></html>`);
     w.document.close();
     w.onload = () => {
       w.focus();
@@ -13579,6 +13601,7 @@ window.storage = {
         code: code,
         customerName: customerName,
         customerPhone: customerPhone,
+        cccd: $("#cd-cccd").value.trim(),
         shop: shop,
         address: $("#cd-address").value.trim(),
         model: $("#cd-model").value || "fnb",
@@ -15014,6 +15037,7 @@ window.storage = {
       creatorEmpId: null,
       leadId: null,
       taskId: null,
+      contractId: newContractId,
       title: "✍️ Khách hàng đã ký hợp đồng!",
       message: `${d.customerName} (${d.customerPhone}) đã ký hợp đồng ${d.code} — ${fmt(d.revenue || 0)}đ`,
       createdAt: now,
