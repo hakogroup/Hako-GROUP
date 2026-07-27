@@ -8605,20 +8605,30 @@ window.storage = {
   }
   async function syncFollowUpNotifications() {
     try {
+      /* Dọn: khách đã được chăm sóc lại (hoặc đã xoá) thì gỡ luôn thông báo cảnh báo cũ */
+      const before = notifications.length;
+      notifications = notifications.filter(n => {
+        if (n.kind !== "followup") return true;
+        const l = customerLeads.find(x => x.id === n.leadId);
+        return l && leadNeedsFollowUp(l);
+      });
+      const pruned = notifications.length !== before;
       const overdue = customerLeads.filter(l => leadNeedsFollowUp(l));
-      if (!overdue.length) return;
       const DAY = 24 * 60 * 60 * 1e3;
       let added = false;
       overdue.forEach(l => {
         const emp = employees.find(e => e.id === l.empId);
         if (!emp || !(emp.position === "sales" || emp.position === "lead" && (emp.leadDept || "sales") === "sales")) return;
-        const existing = notifications.find(n => n.kind === "followup" && n.leadId === l.id && (!n.read || Date.now() - (n.createdAt || 0) < DAY));
-        if (existing) return;
+        /* Mỗi khách chỉ nhắc đúng 1 lần trong ngày */
+        const todayKey = new Date().toISOString().slice(0, 10);
+        const sentToday = notifications.some(n => n.kind === "followup" && n.leadId === l.id && (n.dayKey || new Date(n.createdAt || 0).toISOString().slice(0, 10)) === todayKey);
+        if (sentToday) return;
         const last = leadLastCareTime(l);
         const days = Math.max(3, Math.floor((Date.now() - last) / DAY));
         notifications.push({
           id: "nt" + Date.now() + Math.floor(Math.random() * 1e5),
           kind: "followup",
+          dayKey: new Date().toISOString().slice(0, 10),
           empId: l.empId,
           creatorEmpId: null,
           leadId: l.id,
@@ -8630,7 +8640,7 @@ window.storage = {
         });
         added = true;
       });
-      if (added) {
+      if (added || pruned) {
         await saveNotifications();
         renderNotifBadge();
         renderNotifPanel();
@@ -9876,6 +9886,7 @@ window.storage = {
         await patchListRecordArrayAppend("customer-leads", customerLeads, id, "notes", newNote);
         renderLeadDetailBody(id);
         renderLeads();
+        syncFollowUpNotifications();
         toast("Đã lưu nội dung trao đổi");
       });
     }
@@ -13462,6 +13473,7 @@ window.storage = {
           });
           if (newNoteObj) await patchListRecordArrayAppend("customer-leads", customerLeads, editingLeadId, "notes", newNoteObj);
         }
+        syncFollowUpNotifications();
         toast("Đã cập nhật khách hàng");
       } else {
         const newLead = {
@@ -15038,7 +15050,7 @@ window.storage = {
       window.__leadReassignInterval = setInterval(checkAndReassignStaleLeads, 60 * 1e3);
     }
     if (!window.__followupNotifInterval) {
-      window.__followupNotifInterval = setInterval(syncFollowUpNotifications, 5 * 60 * 1e3);
+      window.__followupNotifInterval = setInterval(syncFollowUpNotifications, 60 * 60 * 1e3);
     }
     if (!window.__autoRefreshInterval) {
       window.__autoRefreshInterval = setInterval(autoRefreshData, 30 * 1e3);
