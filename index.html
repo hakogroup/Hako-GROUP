@@ -1610,8 +1610,17 @@
   .connect-pill.saiso{background:var(--red-soft);color:var(--red);}
   .work-pill{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10.5px;font-weight:650;white-space:nowrap;}
   .followup-warn-badge{
-    display:inline-block;margin-left:6px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;
-    white-space:nowrap;background:var(--red-soft);color:var(--red);
+    display:inline-flex;align-items:center;justify-content:center;
+    width:18px;height:18px;margin-left:6px;border-radius:50%;
+    font-size:12px;font-weight:900;line-height:1;vertical-align:middle;
+    white-space:nowrap;background:var(--red);color:#fff;
+    box-shadow:0 0 0 0 rgba(244,63,94,.45);
+    animation:followupPulse 1.6s ease-out infinite;
+  }
+  @keyframes followupPulse{
+    0%{box-shadow:0 0 0 0 rgba(244,63,94,.45);}
+    70%{box-shadow:0 0 0 6px rgba(244,63,94,0);}
+    100%{box-shadow:0 0 0 0 rgba(244,63,94,0);}
   }
   .work-pill.ketnoi{background:var(--teal-soft);color:var(--teal);}
   .work-pill.demo{background:#E4ECFB;color:#3E5FA0;}
@@ -8594,6 +8603,40 @@ window.storage = {
     const loadCount = id => customerLeads.filter(l => l.empId === id && (l.connectStatus || "moi") === "moi").length;
     return salesEmps.slice().sort((a, b) => loadCount(a.id) - loadCount(b.id))[0];
   }
+  async function syncFollowUpNotifications() {
+    try {
+      const overdue = customerLeads.filter(l => leadNeedsFollowUp(l));
+      if (!overdue.length) return;
+      const DAY = 24 * 60 * 60 * 1e3;
+      let added = false;
+      overdue.forEach(l => {
+        const emp = employees.find(e => e.id === l.empId);
+        if (!emp || !(emp.position === "sales" || emp.position === "lead" && (emp.leadDept || "sales") === "sales")) return;
+        const existing = notifications.find(n => n.kind === "followup" && n.leadId === l.id && (!n.read || Date.now() - (n.createdAt || 0) < DAY));
+        if (existing) return;
+        const last = leadLastCareTime(l);
+        const days = Math.max(3, Math.floor((Date.now() - last) / DAY));
+        notifications.push({
+          id: "nt" + Date.now() + Math.floor(Math.random() * 1e5),
+          kind: "followup",
+          empId: l.empId,
+          creatorEmpId: null,
+          leadId: l.id,
+          taskId: null,
+          title: "🔴 Khách hàng cần chăm sóc lại!",
+          message: `${l.name || "(Chưa có tên)"} (${l.phone || "—"}) đã ${days} ngày chưa được chăm sóc lại — bấm vào để mở khách hàng.`,
+          createdAt: Date.now(),
+          read: false
+        });
+        added = true;
+      });
+      if (added) {
+        await saveNotifications();
+        renderNotifBadge();
+        renderNotifPanel();
+      }
+    } catch (_) {}
+  }
   async function checkAndReassignStaleLeads() {
     if (!currentUser) return;
     const freshLeads = await fetchStorageJSON("customer-leads", []);
@@ -14990,8 +15033,12 @@ window.storage = {
     initChatbot();
     if (currentUser && currentUser.role === "giamdoc") renderAccounts();
     checkAndReassignStaleLeads();
+    syncFollowUpNotifications();
     if (!window.__leadReassignInterval) {
       window.__leadReassignInterval = setInterval(checkAndReassignStaleLeads, 60 * 1e3);
+    }
+    if (!window.__followupNotifInterval) {
+      window.__followupNotifInterval = setInterval(syncFollowUpNotifications, 5 * 60 * 1e3);
     }
     if (!window.__autoRefreshInterval) {
       window.__autoRefreshInterval = setInterval(autoRefreshData, 30 * 1e3);
