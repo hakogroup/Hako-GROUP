@@ -24,6 +24,12 @@
     --amber-soft:#FEF3C7;
     --red:#E11D48;
     --red-soft:#FFE4E6;
+    --green:#059669;
+    --green-soft:#D1FAE5;
+    --blue:#2563EB;
+    --blue-soft:#DBEAFE;
+    --pink:#BE185D;
+    --pink-soft:#FCE7F3;
     --mono:'Roboto Mono', 'Courier New', Courier, monospace;
     --sans:'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   }
@@ -1604,10 +1610,10 @@
   
   .connect-pill{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10.5px;font-weight:650;white-space:nowrap;}
   .connect-pill.moi{background:#EFE7FB;color:#6B46C1;font-weight:700;}
-  .connect-pill.gap{background:var(--teal-soft);color:var(--teal);}
+  .connect-pill.gap{background:var(--blue-soft);color:var(--blue);}
   .connect-pill.chuanghe{background:var(--amber-soft);color:var(--amber);}
   .connect-pill.golai{background:#E4ECFB;color:#3E5FA0;}
-  .connect-pill.saiso{background:var(--red-soft);color:var(--red);}
+  .connect-pill.saiso{background:var(--pink-soft);color:var(--pink);}
   .work-pill{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10.5px;font-weight:650;white-space:nowrap;}
   .followup-warn-badge{
     display:inline-flex;align-items:center;justify-content:center;
@@ -1622,7 +1628,7 @@
     70%{box-shadow:0 0 0 6px rgba(244,63,94,0);}
     100%{box-shadow:0 0 0 0 rgba(244,63,94,0);}
   }
-  .work-pill.ketnoi{background:var(--teal-soft);color:var(--teal);}
+  .work-pill.ketnoi{background:var(--green-soft);color:var(--green);}
   .work-pill.demo{background:#E4ECFB;color:#3E5FA0;}
   .work-pill.thanhtoan{background:var(--teal);color:#fff;}
   .work-pill.chuaketnoi{background:#EDEBE4;color:var(--ink-soft);}
@@ -2108,12 +2114,12 @@
       <div class="cc-card" style="padding:0;overflow:hidden;">
         <div style="padding:16px 18px 4px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
           <h2 style="margin:0;">Danh sách hợp đồng — toàn công ty (<span id="ct-count">0</span>)</h2>
-          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-            <input id="ct-search" type="text" placeholder="🔎 Tìm theo SĐT, mã hợp đồng, tên quán..." style="border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px;min-width:260px;"/>
-            <button class="btn teal" id="btn-open-contract-modal" type="button">+ Thêm hợp đồng</button>
-          </div>
         </div>
         <div style="padding:0 18px 14px;display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;">
+          <div class="cc-field" style="min-width:260px;">
+            <label>Tìm kiếm</label>
+            <input id="ct-search" type="text" placeholder="🔎 Tìm theo SĐT, mã hợp đồng, tên quán..." style="border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px;min-width:260px;"/>
+          </div>
           <div class="cc-field emp-search-field" style="min-width:220px;">
             <label>Lọc theo nhân viên ký</label>
             <div class="emp-search-wrap has-clear">
@@ -2185,7 +2191,7 @@
           <div class="cd-form-section">
             <div class="cd-form-section-title">📄 Thông tin hợp đồng</div>
             <div class="cd-grid">
-              <div class="cc-field"><label>Mã hợp đồng</label><input id="cd-code" placeholder="HD-0001"/></div>
+              <div class="cc-field"><label>Mã hợp đồng (tự động)</label><input id="cd-code" readonly style="background:var(--paper);color:var(--ink-soft);cursor:not-allowed;"/></div>
               <div class="cc-field"><label>Gói đăng ký</label><input id="cd-package" placeholder="VD: Gói 1 năm 3 tháng"/></div>
               <div class="cc-field"><label>Giá trị hợp đồng (đ)</label><input id="cd-revenue" type="text" inputmode="numeric" data-money placeholder="0"/></div>
               <div class="cc-field"><label>Số lượng</label><input id="cd-qty" type="number" min="1" value="1"/></div>
@@ -2352,7 +2358,7 @@
           <div class="quick-filter-row">
             <input id="ld-search" type="text" placeholder="🔎 Tìm theo SĐT, tên khách hàng..." style="border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px;min-width:240px;"/>
             <select id="ld-filter-connect">
-              <option value="">🔄 Tất cả kết nối</option>
+              <option value="">Tất cả kết nối</option>
               <option value="moi">Mới</option>
               <option value="gap">Đã Gọi</option>
               <option value="chuanghe">Chưa Nghe máy</option>
@@ -2360,7 +2366,7 @@
               <option value="saiso">Sai Số</option>
             </select>
             <select id="ld-filter-work">
-              <option value="">📋 Tất cả làm việc</option>
+              <option value="">Tất cả làm việc</option>
               <option value="ketnoi">Kết nối thành công</option>
               <option value="demo">Đã demo</option>
               <option value="thanhtoan">Đã Thanh Toán</option>
@@ -7240,11 +7246,28 @@ window.storage = {
       });
     });
   }
+  function genContractCode() {
+    const now = new Date();
+    const mm = String(now.getMonth() + 1).padStart(2, "0");
+    const yyyy = String(now.getFullYear());
+    const re = new RegExp("^HK(\\d+)-" + mm + "\\/" + yyyy + "$");
+    let max = 0;
+    [ ...contractDrafts, ...customerContracts ].forEach(item => {
+      const m = re.exec(String(item.code || "").trim());
+      if (m) {
+        const n = parseInt(m[1], 10);
+        if (n > max) max = n;
+      }
+    });
+    return "HK" + String(max + 1).padStart(3, "0") + "-" + mm + "/" + yyyy;
+  }
   function resetDraftForm() {
-    [ "cd-code", "cd-customer-name", "cd-customer-phone", "cd-cccd", "cd-mst", "cd-email", "cd-shop", "cd-address", "cd-package", "cd-revenue", "cd-emp", "cd-emp-search", "cd-mktemp", "cd-mktemp-search" ].forEach(id => {
+    [ "cd-customer-name", "cd-customer-phone", "cd-cccd", "cd-mst", "cd-email", "cd-shop", "cd-address", "cd-package", "cd-revenue", "cd-emp", "cd-emp-search", "cd-mktemp", "cd-mktemp-search" ].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = "";
     });
+    const codeEl = document.getElementById("cd-code");
+    if (codeEl) codeEl.value = genContractCode();
     const qtyEl = document.getElementById("cd-qty");
     if (qtyEl) qtyEl.value = "1";
     const srcEl = document.getElementById("cd-source");
@@ -8047,13 +8070,13 @@ window.storage = {
   }
   const CONNECT_COLOR = {
     moi: "#6B46C1",
-    gap: "var(--teal)",
+    gap: "var(--blue)",
     chuanghe: "var(--amber)",
     golai: "#3E5FA0",
-    saiso: "var(--red)"
+    saiso: "var(--pink)"
   };
   const WORK_COLOR = {
-    ketnoi: "var(--teal)",
+    ketnoi: "var(--green)",
     demo: "#3E5FA0",
     thanhtoan: "var(--teal)",
     chuaketnoi: "var(--ink-soft)",
@@ -13334,10 +13357,6 @@ window.storage = {
     resetContractForm();
     closeContractModal();
   });
-  document.getElementById("btn-open-contract-modal").addEventListener("click", () => {
-    resetContractForm();
-    openContractModal();
-  });
   document.getElementById("ct-form-modal-close").addEventListener("click", () => {
     resetContractForm();
     closeContractModal();
@@ -14561,8 +14580,6 @@ window.storage = {
     } else {
       document.getElementById("pay-summary").style.display = "";
     }
-    const contractAddBtn = document.getElementById("btn-open-contract-modal");
-    if (contractAddBtn) contractAddBtn.style.display = role === "cskh" ? "none" : "";
     let leadDept = null;
     if (role === "lead") {
       leadDept = currentUser.lead_department || "sales";
