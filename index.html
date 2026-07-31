@@ -1630,7 +1630,7 @@
   }
   .work-pill.ketnoi{background:var(--green-soft);color:var(--green);}
   .work-pill.demo{background:#E4ECFB;color:#3E5FA0;}
-  .work-pill.thanhtoan{background:var(--teal);color:#fff;}
+  .work-pill.thanhtoan{background:var(--teal-soft);color:var(--teal);}
   .work-pill.chuaketnoi{background:#EDEBE4;color:var(--ink-soft);}
   .work-pill.chuyenhang{background:var(--amber-soft);color:var(--amber);}
   .work-pill.thatbai{background:var(--red-soft);color:var(--red);}
@@ -7754,7 +7754,7 @@ window.storage = {
         const id = btn.getAttribute("data-ct-approve");
         const c = customerContracts.find(x => x.id === id);
         if (!c || c.approved !== false) return;
-        if (!await showConfirmDialog(`Duyệt hợp đồng ${c.code || ""}? Doanh thu ${fmt(c.revenue || 0)}đ sẽ được cộng cho nhân viên.`)) return;
+        if (!await showConfirmDialog(`Duyệt hợp đồng ${c.code || ""}? Doanh thu ${fmt(c.revenue || 0)}đ sẽ được cộng cho nhân viên.`, { okText: "Duyệt", cancelText: "Huỷ" })) return;
         c.approved = true;
         c.approvedBy = currentUser.username || currentUser.name || currentUser.role;
         c.approvedAt = Date.now();
@@ -13319,6 +13319,24 @@ window.storage = {
             month: (c.signDate || "").slice(0, 7)
           });
           await patchListRecordFields("customer-contracts", customerContracts, editingContractId, data);
+          const linkedDraft = contractDrafts.find(x => x.linkedContractId === editingContractId);
+          if (linkedDraft) {
+            const draftFields = {
+              code: data.code,
+              customerPhone: data.phone,
+              shop: data.shop,
+              address: data.address,
+              model: data.model,
+              package: data.package,
+              revenue: data.revenue,
+              source: data.source,
+              empId: data.empId,
+              mktEmpId: data.mktEmpId,
+              updatedAt: Date.now()
+            };
+            Object.assign(linkedDraft, draftFields);
+            await patchDraftFields(linkedDraft.id, draftFields);
+          }
         }
         toast("Đã cập nhật hợp đồng");
       } else {
