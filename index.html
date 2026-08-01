@@ -526,6 +526,13 @@
     background:#fff;color:var(--ink-soft);cursor:pointer;
   }
   .task-move-btn:hover{background:var(--teal-soft);color:var(--teal);border-color:var(--teal);}
+  .task-move-btn.active{font-weight:800;cursor:default;}
+  .task-move-btn.active:hover{background:inherit;}
+  .task-move-btn.active.chuabatdau{background:#EEECE4;color:var(--ink-soft);border-color:#B9B4A8;}
+  .task-move-btn.active.dangtienhanh{background:#E3EEFC;color:#1D6FD8;border-color:#1D6FD8;}
+  .task-move-btn.active.dangcho{background:#FFF0DE;color:#C2680A;border-color:#C2680A;}
+  .task-move-btn.active.hoanthanh{background:#E3F5EA;color:#0E9F6E;border-color:#0E9F6E;}
+  .task-move-btn.active.huybo{background:#EBEBEB;color:#555;border-color:#8A8A8A;}
   .task-result-btn{font-size:11px;padding:5px 10px;border-radius:7px;border:1px solid var(--line);background:#fff;cursor:pointer;}
   .task-result-btn.active.thanhcong{background:#E3F5EA;color:#0E9F6E;border-color:#0E9F6E;}
   .task-result-btn.active.thatbai{background:#FCE7E8;color:var(--red);border-color:var(--red);}
@@ -2113,7 +2120,7 @@
 
       <div class="cc-card" style="padding:0;overflow:hidden;">
         <div style="padding:16px 18px 4px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
-          <h2 style="margin:0;">Danh sách hợp đồng — toàn công ty (<span id="ct-count">0</span>)</h2>
+          <h2 style="margin:0;">Danh sách hợp đồng — tháng <span class="month-label"></span> (<span id="ct-count">0</span>)</h2>
         </div>
         <div style="padding:0 18px 14px;display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;">
           <div class="cc-field" style="min-width:260px;">
@@ -2253,7 +2260,7 @@
 
       <div class="cc-card">
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
-          <h2 style="margin:0;">Danh sách hợp đồng đang soạn</h2>
+          <h2 style="margin:0;">Danh sách hợp đồng đang soạn — tháng <span class="month-label"></span></h2>
           <button class="btn teal" id="btn-open-draft-modal">+ Soạn hợp đồng mới</button>
         </div>
         <div class="tbl-scroll" style="margin-top:12px;">
@@ -2354,7 +2361,7 @@
 
       <div class="cc-card" style="padding:0;overflow:hidden;">
         <div style="padding:16px 18px 4px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
-          <h2 style="margin:0;">Danh sách khách hàng (<span id="ld-count">0</span>)</h2>
+          <h2 style="margin:0;">Danh sách khách hàng — tháng <span class="month-label"></span> (<span id="ld-count">0</span>)</h2>
           <div class="quick-filter-row">
             <input id="ld-search" type="text" placeholder="🔎 Tìm theo SĐT, tên khách hàng..." style="border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px;min-width:240px;"/>
             <select id="ld-filter-connect">
@@ -2435,16 +2442,18 @@
           <div class="cc-row">
             <div class="cc-field" style="flex:1;min-width:260px;"><label>Tiêu đề công việc</label><input id="tk-title" placeholder="VD: Gọi lại khách hàng ABC" /></div>
           </div>
-          <div class="cc-row">
-            <div class="cc-field" style="flex:1;min-width:260px;"><label>Mô tả chi tiết (không bắt buộc)</label><textarea id="tk-desc" rows="3" placeholder="Ghi chú thêm, hướng dẫn cụ thể..." style="width:100%;resize:vertical;"></textarea></div>
+            <div class="cc-row">
+            <div class="cc-field" style="flex:1;min-width:260px;gap:8px;"><label style="display:block;">Mô tả chi tiết (không bắt buộc)</label><textarea id="tk-desc" rows="3" placeholder="Ghi chú thêm, hướng dẫn cụ thể..." style="width:100%;resize:vertical;margin-top:2px;"></textarea></div>
           </div>
           <div class="cc-row">
             <div class="cc-field emp-search-field">
               <label>Giao cho</label>
-              <input type="text" id="tk-assignee-search" placeholder="🔎 Tìm mã NV hoặc tên..." autocomplete="off"/>
-              <input type="hidden" id="tk-assignee"/>
-              <button type="button" class="emp-search-clear-btn" id="tk-assignee-x" title="Bỏ chọn">✕</button>
-              <div class="emp-search-dropdown" id="tk-assignee-dropdown"></div>
+              <div class="emp-search-wrap has-clear">
+                <input type="text" id="tk-assignee-search" placeholder="🔎 Tìm mã NV hoặc tên..." autocomplete="off"/>
+                <input type="hidden" id="tk-assignee"/>
+                <button type="button" class="emp-search-clear-btn" id="tk-assignee-x" title="Bỏ chọn">✕</button>
+                <div class="emp-search-dropdown" id="tk-assignee-dropdown"></div>
+              </div>
             </div>
             <div class="cc-field"><label>Hạn hoàn thành</label><input id="tk-deadline" type="datetime-local"/></div>
           </div>
@@ -2456,7 +2465,7 @@
 
       <div class="cc-card">
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
-          <h2 style="margin:0;">Bảng công việc <span class="rpt-dept-badge" id="task-total-badge" style="background:#EEECE4;color:var(--ink-soft);">0 việc</span></h2>
+          <h2 style="margin:0;">Bảng công việc — tháng <span class="month-label"></span> <span class="rpt-dept-badge" id="task-total-badge" style="background:#EEECE4;color:var(--ink-soft);">0 việc</span></h2>
           <button class="btn teal" id="btn-open-task-modal">+ Giao việc mới</button>
         </div>
         <div class="task-toolbar">
@@ -2466,10 +2475,12 @@
           </div>
           <div class="cc-field emp-search-field">
             <label>Lọc theo người được giao</label>
-            <input type="text" id="tk-filter-emp-search" placeholder="🔎 Tất cả — tìm mã NV hoặc tên..." autocomplete="off"/>
-            <input type="hidden" id="tk-filter-emp"/>
-            <button type="button" class="emp-search-clear-btn" id="tk-filter-emp-x" title="Bỏ chọn">✕</button>
-            <div class="emp-search-dropdown" id="tk-filter-emp-dropdown"></div>
+            <div class="emp-search-wrap has-clear">
+              <input type="text" id="tk-filter-emp-search" placeholder="🔎 Tất cả — tìm mã NV hoặc tên..." autocomplete="off"/>
+              <input type="hidden" id="tk-filter-emp"/>
+              <button type="button" class="emp-search-clear-btn" id="tk-filter-emp-x" title="Bỏ chọn">✕</button>
+              <div class="emp-search-dropdown" id="tk-filter-emp-dropdown"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -2550,7 +2561,7 @@
 
       <div class="cc-card" style="padding:0;overflow:hidden;">
         <div style="padding:16px 18px 4px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
-          <h2 style="margin:0;">Nhật ký cuộc gọi (<span id="cskh-count">0</span>)</h2>
+          <h2 style="margin:0;">Nhật ký cuộc gọi — tháng <span class="month-label"></span> (<span id="cskh-count">0</span>)</h2>
           <input id="cskh-search" type="text" placeholder="🔎 Tìm theo SĐT hoặc tên khách..." style="border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px;min-width:240px;"/>
         </div>
         <div style="padding:0 18px 14px;display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;">
@@ -7016,6 +7027,7 @@ window.storage = {
   }
   function searchedContracts() {
     let list = visibleContracts();
+    list = list.filter(c => (c.signDate || "").slice(0, 7) === currentMonth());
     const term = (contractSearchTerm || "").trim().toLowerCase();
     if (term) {
       list = list.filter(c => String(c.phone || "").toLowerCase().includes(term) || String(c.code || "").toLowerCase().includes(term) || String(c.shop || "").toLowerCase().includes(term));
@@ -7156,7 +7168,10 @@ window.storage = {
   function renderContractDrafts() {
     const tbody = document.getElementById("cd-tbody");
     if (!tbody) return;
-    const list = visibleDrafts().slice().sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    const list = visibleDrafts().filter(d => {
+      const ym = d.createdAt ? new Date(d.createdAt).toISOString().slice(0, 7) : "";
+      return ym === currentMonth();
+    }).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
     document.getElementById("cd-empty").style.display = list.length ? "none" : "block";
     tbody.innerHTML = list.map(d => `\n      <tr>\n        <td>\n          <div style="font-weight:700;">${escapeHtml(d.customerName || "")}</div>\n          <div style="font-size:11px;color:var(--ink-soft);font-family:var(--mono);">${escapeHtml(d.customerPhone || "")} · ${escapeHtml(d.shop || "")}</div>\n        </td>\n        <td>${escapeHtml(d.package || "—")}<br/><span style="font-family:var(--mono);color:var(--red);font-weight:700;">${fmt(d.revenue || 0)}đ</span></td>\n        <td><span class="connect-pill" style="background:${DRAFT_STATUS_COLOR[d.status] || "#eee"};color:#fff;">${DRAFT_STATUS_LABEL[d.status] || d.status}</span></td>\n        <td style="white-space:nowrap;">\n          ${d.status !== "signed" ? `<button class="btn ghost sm" data-cd-link="${d.id}">🔗 Lấy link</button>` : `<button class="btn ghost sm" data-cd-view="${d.id}">👁️ Xem lại</button>`}\n          ${d.status === "signed" && currentUser && currentUser.role === "giamdoc" ? `<button class="btn danger-ghost sm" data-cd-del-signed="${d.id}">Xoá</button>` : ""}\n          ${d.status === "draft" || d.status === "sent" ? `<button class="btn danger-ghost sm" data-cd-cancel="${d.id}">Huỷ</button>` : ""}\n          ${d.status === "cancelled" ? `<button class="btn danger-ghost sm" data-cd-del="${d.id}">Xoá</button>` : ""}\n        </td>\n      </tr>\n    `).join("");
     $$("[data-cd-link]", tbody).forEach(btn => {
@@ -8153,6 +8168,7 @@ window.storage = {
   }
   function searchedLeads() {
     let list = visibleLeads();
+    list = list.filter(l => (l.date || "").slice(0, 7) === currentMonth());
     const term = (leadSearchTerm || "").trim().toLowerCase();
     if (term) list = list.filter(l => String(l.phone || "").toLowerCase().includes(term) || String(l.name || "").toLowerCase().includes(term));
     if (leadFilterConnect) list = list.filter(l => (l.connectStatus || "moi") === leadFilterConnect);
@@ -8615,6 +8631,72 @@ window.storage = {
     }
     renderNotifBadge();
     renderNotifPanel();
+  }
+  async function notifyTaskCompleted(t) {
+    if (!t) return;
+    const actorEmpId = currentUser ? currentUser.employee_id : null;
+    const recipients = new Set();
+    if (t.creatorEmpId && t.creatorEmpId !== actorEmpId) recipients.add(t.creatorEmpId);
+    if (t.assigneeEmpId && t.assigneeEmpId !== actorEmpId && t.assigneeEmpId !== t.creatorEmpId) recipients.add(t.assigneeEmpId);
+    if (!recipients.size) return;
+    recipients.forEach(empId => {
+      notifications.push({
+        id: "nt" + Date.now() + Math.floor(Math.random() * 1e3) + empId,
+        empId: empId,
+        creatorEmpId: actorEmpId,
+        leadId: null,
+        taskId: t.id,
+        title: "✅ Công việc đã hoàn thành",
+        message: t.title || "(Không có tiêu đề)",
+        createdAt: Date.now(),
+        read: false
+      });
+    });
+    await saveNotifications();
+    renderNotifBadge();
+    renderNotifPanel();
+  }
+  async function syncTaskOverdueNotifications() {
+    try {
+      const before = notifications.length;
+      notifications = notifications.filter(n => {
+        if (n.kind !== "task_overdue") return true;
+        const t = tasks.find(x => x.id === n.taskId);
+        return t && isTaskOverdue(t);
+      });
+      const pruned = notifications.length !== before;
+      const overdueTasks = tasks.filter(t => isTaskOverdue(t));
+      const todayKey = new Date().toISOString().slice(0, 10);
+      let added = false;
+      overdueTasks.forEach(t => {
+        const recipients = new Set();
+        if (t.assigneeEmpId) recipients.add(t.assigneeEmpId);
+        if (t.creatorEmpId) recipients.add(t.creatorEmpId);
+        recipients.forEach(empId => {
+          const sentToday = notifications.some(n => n.kind === "task_overdue" && n.taskId === t.id && n.empId === empId && (n.dayKey || new Date(n.createdAt || 0).toISOString().slice(0, 10)) === todayKey);
+          if (sentToday) return;
+          notifications.push({
+            id: "nt" + Date.now() + Math.floor(Math.random() * 1e5) + empId,
+            kind: "task_overdue",
+            dayKey: todayKey,
+            empId: empId,
+            creatorEmpId: null,
+            leadId: null,
+            taskId: t.id,
+            title: "⏰ Công việc quá hạn!",
+            message: `${t.title || "(Không có tiêu đề)"} đã quá hạn hoàn thành${t.deadline ? " (" + fmtTaskDeadline(t.deadline) + ")" : ""} — bấm vào để xem chi tiết.`,
+            createdAt: Date.now(),
+            read: false
+          });
+          added = true;
+        });
+      });
+      if (added || pruned) {
+        await saveNotifications();
+        renderNotifBadge();
+        renderNotifPanel();
+      }
+    } catch (_) {}
   }
   const REASSIGN_TIMEOUT_MS = 20 * 60 * 1e3;
   function isLeadFromMarketing(lead) {
@@ -9458,6 +9540,7 @@ window.storage = {
       await patchTaskFields(t.id, Object.assign({}, patch, {
         updatedAt: t.updatedAt
       }));
+      if (patch.status === "hoanthanh") await notifyTaskCompleted(t);
       renderTasks();
       return {
         thanh_cong: true,
@@ -9968,6 +10051,7 @@ window.storage = {
   }
   function searchedCskhCalls() {
     let list = visibleCskhCalls();
+    list = list.filter(c => (c.date || "").slice(0, 7) === currentMonth());
     const term = (cskhSearchTerm || "").trim().toLowerCase();
     if (term) list = list.filter(c => String(c.phone || "").toLowerCase().includes(term) || String(c.name || "").toLowerCase().includes(term));
     if (cskhFilterFrom) list = list.filter(c => (c.date || "") >= cskhFilterFrom);
@@ -10015,6 +10099,10 @@ window.storage = {
   }
   function searchedTasks() {
     let list = visibleTasks();
+    list = list.filter(t => {
+      const ym = t.createdAt ? new Date(t.createdAt).toISOString().slice(0, 7) : "";
+      return ym === currentMonth();
+    });
     if (taskFilterEmpId) list = list.filter(t => t.assigneeEmpId === taskFilterEmpId);
     return list;
   }
@@ -10109,6 +10197,7 @@ window.storage = {
           status: newStatus,
           updatedAt: Date.now()
         });
+        if (newStatus === "hoanthanh") await notifyTaskCompleted(t);
         renderTasks();
       });
     });
@@ -10137,6 +10226,7 @@ window.storage = {
           status: newStatus,
           updatedAt: now
         });
+        if (newStatus === "hoanthanh") await notifyTaskCompleted(t);
         renderTaskDetailBody(id);
         renderTasks();
       });
@@ -13018,6 +13108,14 @@ window.storage = {
     renderReport();
     renderPayroll();
     renderFinance();
+    ctPage = 1;
+    ldPage = 1;
+    cskhPage = 1;
+    renderContracts();
+    renderContractDrafts();
+    renderLeads();
+    renderCskhCalls();
+    renderTasks();
     document.getElementById("payslip-holder").innerHTML = "";
   });
   const MONTH_SHORT_LABELS = [ "Th1", "Th2", "Th3", "Th4", "Th5", "Th6", "Th7", "Th8", "Th9", "Th10", "Th11", "Th12" ];
@@ -15081,11 +15179,15 @@ window.storage = {
     if (currentUser && currentUser.role === "giamdoc") renderAccounts();
     checkAndReassignStaleLeads();
     syncFollowUpNotifications();
+    syncTaskOverdueNotifications();
     if (!window.__leadReassignInterval) {
       window.__leadReassignInterval = setInterval(checkAndReassignStaleLeads, 60 * 1e3);
     }
     if (!window.__followupNotifInterval) {
       window.__followupNotifInterval = setInterval(syncFollowUpNotifications, 60 * 60 * 1e3);
+    }
+    if (!window.__taskOverdueInterval) {
+      window.__taskOverdueInterval = setInterval(syncTaskOverdueNotifications, 5 * 60 * 1e3);
     }
     if (!window.__autoRefreshInterval) {
       window.__autoRefreshInterval = setInterval(autoRefreshData, 30 * 1e3);
